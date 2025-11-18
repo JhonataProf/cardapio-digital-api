@@ -8,9 +8,6 @@ import { createUserSchema } from "../schemas";
 export default (router: Router): void => {
   router.post(
     "/users",
-    authMiddleware,
-    authorizeRoles(["Gerente", "Funcionario"]),
-    validateBody(createUserSchema),
     adaptRoute(new CriarUsuarioController())
   );
 };
