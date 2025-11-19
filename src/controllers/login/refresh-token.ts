@@ -28,6 +28,7 @@ class RefreshTokenController implements Controller {
       const newAccessToken = tokenizer.generateToken({
         id: user.id,
         email: user.email,
+        role: user.role,
       });
 
       return ok({ token: newAccessToken });

@@ -24,6 +24,14 @@ export default function authMiddleware(req: Request, res: Response, next: NextFu
 
     const decoded = jwt.verify(token, secret, { algorithms: ["HS256"] }) as AppJwtPayload;
 
+    const now = Date.now();
+    const expMs = decoded.exp ? decoded.exp * 1000 : null;
+    const isExpired = expMs !== null ? expMs < now : false;
+
+    if (isExpired) {
+      return res.status(401).json({ message: "Token expirado" });
+    }
+
     (req as any).user = {
       id: decoded.sub,
       email: decoded.email,
