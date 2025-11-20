@@ -1,38 +1,83 @@
+// src/middlewares/auth-middleware.ts
+import { ENV } from "@/config/env";
+import { logger } from "@/config/logger";
 import { NextFunction, Request, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 
-type AppJwtPayload = JwtPayload & {
+export type AppJwtPayload = JwtPayload & {
   sub: string;
   email?: string;
   role?: string;
 };
 
-export default function authMiddleware(req: Request, res: Response, next: NextFunction) {
+export interface AuthenticatedRequest extends Request {
+  user?: {
+    id: string;
+    email?: string;
+    role?: string;
+  };
+}
+
+export default function authMiddleware(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+) {
   try {
     const authHeader = req.headers.authorization ?? "";
     const [scheme = "", token] = authHeader.split(" ");
 
     if (!token || !/^Bearer$/i.test(scheme)) {
-      return res.status(401).json({ message: "Credenciais ausentes ou inválidas" });
+      logger.warn("Missing or invalid Authorization header", {
+        path: req.path,
+        method: req.method,
+      });
+
+      return res.status(401).json({
+        error: {
+          code: "UNAUTHORIZED",
+          message: "Credenciais ausentes ou inválidas",
+        },
+        links: [{ rel: "login", href: "/login", method: "POST" }],
+      });
     }
 
-    const secret = process.env.JWT_SECRET;
+    const secret = ENV.JWT_SECRET;
     if (!secret) {
-      // Falhar cedo: sem segredo, não dá pra validar
-      return res.status(500).json({ message: "Configuração de autenticação ausente" });
+      logger.error("JWT_SECRET is not configured");
+      return res.status(500).json({
+        error: {
+          code: "INTERNAL_ERROR",
+          message: "Configuração de autenticação inválida",
+        },
+      });
     }
 
-    const decoded = jwt.verify(token, secret, { algorithms: ["HS256"] }) as AppJwtPayload;
+    const decoded = jwt.verify(token, secret, {
+      algorithms: ["HS256"],
+    }) as AppJwtPayload;
 
-    (req as any).user = {
+    req.user = {
       id: decoded.sub,
       email: decoded.email,
       role: decoded.role,
     };
 
     return next();
-  } catch (err: any) {
-    // Evite vazar detalhes (ex.: expiração) — responda genericamente
-    return res.status(401).json({ message: "Não autorizado" });
+  } catch (err) {
+    logger.warn("JWT verification failed", {
+      path: req.path,
+      method: req.method,
+      error:
+        err instanceof Error ? { message: err.message, name: err.name } : err,
+    });
+
+    return res.status(401).json({
+      error: {
+        code: "UNAUTHORIZED",
+        message: "Não autorizado",
+      },
+      links: [{ rel: "login", href: "/login", method: "POST" }],
+    });
   }
 }

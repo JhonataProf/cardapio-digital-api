@@ -1,29 +1,40 @@
-import express from "express";
+// src/config/app.ts
+import { setupErrorHandlers } from "@/middlewares";
+import express, { Application } from "express";
 import swaggerUi from "swagger-ui-express";
 import YAML from "yamljs";
-import setupMiddlewares from "./middlewares";
-import setupRoutes from "./routes";
-import { resolveRuntimePath } from "./paths";
 import { ENV } from "./env";
-import { setupErrorHandlers } from "@/middlewares";
+import setupMiddlewares from "./middlewares";
+import { resolveRuntimePath } from "./paths";
+import setupRoutes from "./routes";
 
-const app = express();
+export const createApp = (): Application => {
+  const app = express();
 
-// Swagger opcional
-if (ENV.SWAGGER_ENABLED) {
-  const swaggerFile = resolveRuntimePath("docs/api/swagger.yaml");
-  const swaggerDocument = YAML.load(swaggerFile);
-  app.get("/", (_req, res) => res.redirect("/api-docs"));
-  app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-} else {
-  app.get("/", (_req, res) => res.status(204).end());
-}
+  // Swagger opcional
+  if (ENV.SWAGGER_ENABLED) {
+    const swaggerFile = resolveRuntimePath("docs/api/swagger.yaml");
+    const swaggerDocument = YAML.load(swaggerFile);
 
-// Middlewares **antes** das rotas
-setupMiddlewares(app);
+    // Redireciona raiz para /api-docs
+    app.get("/", (_req, res) => res.redirect("/api-docs"));
+    app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+  } else {
+    app.get("/", (_req, res) => res.status(204).end());
+  }
 
-// Rotas
-setupRoutes(app);
-setupErrorHandlers(app);
+  // Middlewares globais (incluindo CORS, JSON parser, security headers, etc.)
+  setupMiddlewares(app);
 
+  // Rotas da aplicação
+  setupRoutes(app);
+
+  // Error handlers devem SEMPRE ser os últimos
+  setupErrorHandlers(app);
+
+  return app;
+};
+
+// compatibilidade com o que você já usa hoje (default import)
+const app = createApp();
 export default app;

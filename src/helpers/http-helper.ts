@@ -39,3 +39,14 @@ export const forbidden = (data?: any): HttpResponse => ({
   statusCode: 403,
   body: data,
 });
+
+export const badRequestResource = (resource: any): HttpResponse => ({
+  statusCode: 400,
+  body: resource,
+});
+
+export const unauthorizedResource = (resource: any): HttpResponse => ({
+  statusCode: 401,
+  body: resource,
+});
+
