@@ -64,30 +64,6 @@ export class LoginService {
 
     // 2. Se o domínio usa perfis, adapte includes/where conforme seu modelo
 
-    // const cliente = await Cliente.findOne({
-    //   where: { email },
-    //   include: [User], // se tiver associação
-    // } as any);
-    // if (cliente && (cliente as any).user) {
-    //   return (cliente as any).user as User;
-    // }
-
-    // const funcionario = await Funcionario.findOne({
-    //   where: { email },
-    //   // include: [User],
-    // } as any);
-    // if (funcionario && (funcionario as any).user) {
-    //   return (funcionario as any).user as User;
-    // }
-
-    // const gerente = await Gerente.findOne({
-    //   where: { email },
-    //   // include: [User],
-    // } as any);
-    // if (gerente && (gerente as any).user) {
-    //   return (gerente as any).user as User;
-    // }
-
     return null;
   }
 

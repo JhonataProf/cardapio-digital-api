@@ -31,12 +31,22 @@ describe("Users API (integration)", () => {
       });
 
     // ajuste se hoje seu controller retorna 200 em vez de 201
-    expect([200, 201]).toContain(res.status);
+    expect(res.status).toBe(201);
+    expect(res.body).toHaveProperty("data");
+    expect(res.body).toHaveProperty("links");
     expect(res.type).toMatch(/json/);
 
     // aqui assumo que pelo menos um id/email venha no body
-    expect(res.body.data).toHaveProperty("id");
-    expect(res.body.data).toHaveProperty("email", "fulano@example.com");
+    expect(res.body.data).toMatchObject({
+      nome: "Fulano da Silva",
+      email: "fulano@example.com",
+      role: "Funcionario",
+    });
+
+    expect(res.body.links.self).toMatchObject({
+      href: expect.stringMatching(/\/api\/usuarios\/\d+/),
+      method: "GET",
+    });
   });
 
   it("deve recusar criar usuário com email já existente", async () => {
@@ -140,5 +150,16 @@ describe("Users API (integration)", () => {
     expect(emails).toEqual(
       expect.arrayContaining(["usera@example.com", "userb@example.com"])
     );
+
+    const [first] = res.body.data;
+
+    expect(first).toHaveProperty("id");
+    expect(first).toHaveProperty("email");
+    expect(first).toHaveProperty("links.self");
+
+    expect(res.body.links.self).toMatchObject({
+      href: "/api/usuarios",
+      method: "GET",
+    });
   });
 });
