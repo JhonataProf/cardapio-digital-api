@@ -26,6 +26,7 @@ export const updateUserSchema = z.object({
     .min(3, { error: "O nome de usuario deve ter no mínimo 3 caracteres" })
     .max(30, { error: "O nome de usuario deve ter no máximo 30 caracteres" })
     .optional(),
+  email: z.email({ error: "O email está no formato incorreto" }).optional(),
   senha: z
     .string()
     .min(6, { error: "A senha deve ter no minimo 6 caracteres" })

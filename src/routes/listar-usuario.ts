@@ -1,13 +1,14 @@
 import { Router } from "express";
 import adaptRoute from "../adapters/express-route-adapter";
-import ListarUsuarioController from "../controllers/usuario/listar-usuario";
-import { authMiddleware, authorizeRoles } from "../middlewares";
+import { ListUsersControllerFactory } from "@/factories/controller/usuario/list-users-controller-factory";
+import authMiddleware from "@/middlewares/auth-middleware";
+import authorizeRoles from "@/middlewares/authorize-roles";
 
 export default (router: Router): void => {
   router.get(
-    "/users{/:id}",
+    "/usuarios",
     authMiddleware,
-    authorizeRoles(["Gerente", "Funcionario"]),
-    adaptRoute(new ListarUsuarioController())
+    authorizeRoles(["Gerente"]),
+    adaptRoute(ListUsersControllerFactory())
   );
 };

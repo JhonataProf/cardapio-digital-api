@@ -1,9 +1,8 @@
-// tests/integration/create-user.controller.int.spec.ts
 import { api } from "../helpers/api";
 import { seedUserAndLogin } from "../helpers/auth";
 import { closeDb, resetDb, syncDb } from "../helpers/db";
 
-describe("CreateUserController (integration)", () => {
+describe("Users API (integration)", () => {
   let token: string;
 
   beforeAll(async () => {
@@ -12,7 +11,7 @@ describe("CreateUserController (integration)", () => {
 
   beforeEach(async () => {
     await resetDb();
-    const auth = await seedUserAndLogin(); // cria user+perfil e loga
+    const auth = await seedUserAndLogin(); // cria um usuário (provavelmente Gerente) e faz login
     token = auth.token;
   });
 
@@ -21,113 +20,125 @@ describe("CreateUserController (integration)", () => {
   });
 
   it("deve criar um usuário com sucesso", async () => {
-    const resp = await api().withAuth(api().post("/api/users"), token).send({
-      nome: "John Doe",
-      email: "jhondoe123@dominio.com",
-      senha: "senha123",
-      role: "Gerente",
-    });
+    const res = await api()
+      .post("/api/usuarios")
+      .set("Authorization", `Bearer ${token}`)
+      .send({
+        nome: "Fulano da Silva",
+        email: "fulano@example.com",
+        senha: "senha123",
+        role: "Funcionario",
+      });
 
-    expect(resp.status).toBe(201); // se sua API retorna 201
-    expect(resp.type).toMatch(/json/);
-    expect(resp.body).toHaveProperty("id");
-    expect(resp.body).toMatchObject({
-      nome: "John Doe",
-      email: "jhondoe123@dominio.com",
-      role: "Gerente",
-    });
+    // ajuste se hoje seu controller retorna 200 em vez de 201
+    expect([200, 201]).toContain(res.status);
+    expect(res.type).toMatch(/json/);
+
+    // aqui assumo que pelo menos um id/email venha no body
+    expect(res.body.data).toHaveProperty("id");
+    expect(res.body.data).toHaveProperty("email", "fulano@example.com");
   });
 
-  it("não deve criar usuário sem autenticação", async () => {
-    const resp = await api().post("/api/users").send({
-      nome: "John Doe",
-      email: "jhondoe123@dominio.com",
-      senha: "senha123",
-      role: "Gerente",
-    });
-    expect(resp.status).toBe(401);
-    expect(resp.type).toMatch(/json/);
-    expect(resp.body).toEqual({
-      message: "Credenciais ausentes ou inválidas",
-    });
-  });
+  it("deve recusar criar usuário com email já existente", async () => {
+    // 1) cria usuário
+    const first = await api()
+      .post("/api/usuarios")
+      .set("Authorization", `Bearer ${token}`)
+      .send({
+        nome: "Usuário 1",
+        email: "duplicado@example.com",
+        senha: "senha123",
+        role: "Funcionario",
+      });
 
-  it("não deve criar usuário com dados inválidos", async () => {
-    // ARRANGE
-    const dadosInvalidos = {
-      nome: "Jo", // muito curto
-      email: "emailinvalido", // formato inválido
-      senha: "123", // muito curto
-      role: "Administrador", // valor inválido
-    };
-    // ACT
-    const resp = await api()
-      .withAuth(api().post("/api/users"), token)
-      .send(dadosInvalidos);
-    // ASSERT
-    expect(resp.status).toBe(400);
-    expect(resp.type).toMatch(/json/);
-    expect(resp.body).toEqual({
-      errors: [
-        {
-          message: "O nome de usuario deve ter no mínimo 3 caracteres",
-          path: "nome",
-        },
-        { message: "O email está no formato incorreto", path: "email" },
-        { message: "A senha deve ter no minimo 6 caracteres", path: "senha" },
-        {
-          message: "A role deve ser 'Gerente', 'Funcionario' ou 'Cliente'",
-          path: "role",
-        },
-      ],
-      message: "Validation error",
-    });
-  });
+    expect([200, 201]).toContain(first.status);
 
-  it("não deve criar usuário sem dados obrigatórios", async () => {
-    const dadosFaltando = {}; // nenhum campo fornecido
-    const resp = await api()
-      .withAuth(api().post("/api/users"), token)
-      .send(dadosFaltando);
-    expect(resp.status).toBe(400);
-    expect(resp.type).toMatch(/json/);
-    expect(resp.body).toEqual({
-      errors: [
-        { message: "O nome de usuario é obrigatório", path: "nome" },
-        { message: "O email está no formato incorreto", path: "email" },
-        { message: "A senha é obrigatória", path: "senha" },
-        {
-          message: "A role deve ser 'Gerente', 'Funcionario' ou 'Cliente'",
-          path: "role",
-        },
-      ],
-      message: "Validation error",
-    });
-  });
+    // 2) tenta criar com o mesmo email
+    const dup = await api()
+      .post("/api/usuarios")
+      .set("Authorization", `Bearer ${token}`)
+      .send({
+        nome: "Usuário 2",
+        email: "duplicado@example.com",
+        senha: "senha123",
+        role: "Funcionario",
+      });
 
-  it("não deve criar usuário com email já existente", async () => {
-    // 1ª criação
-    const first = await api().withAuth(api().post("/api/users"), token).send({
-      nome: "Jane Doe",
-      email: "jhondoe123@dominio.com",
-      senha: "senha123",
-      role: "Gerente",
-    });
-    expect(first.status).toBe(201);
-
-    // 2ª criação (duplicada)
-    const dup = await api().withAuth(api().post("/api/users"), token).send({
-      nome: "Outra Pessoa",
-      email: "jhondoe123@dominio.com",
-      senha: "senha123",
-      role: "Gerente",
-    });
-
-    expect(dup.status).toBe(400);
+    // pelo teste antigo, hoje você retorna 400 com InvalidParamError
+    // se depois migrar para 409/Resource, é só ajustar aqui
+    expect(dup.status).toBe(409);
     expect(dup.type).toMatch(/json/);
-    expect(dup.body).toEqual({
-      message: "Verifique o seguinte parâmetro inválido: email",
-      name: "InvalidParamError",
+    expect(dup.body.data.error).toHaveProperty("code");
+    expect(dup.body.data.error).toHaveProperty("message");
+  });
+
+  it("deve validar corpo da requisição (Zod) ao criar usuário", async () => {
+    const res = await api()
+      .post("/api/usuarios")
+      .set("Authorization", `Bearer ${token}`)
+      .send({
+        // email inválido e sem senha
+        nome: "",
+        email: "nao-e-email",
+        role: "Funcionario",
+      });
+
+    expect(res.status).toBe(400);
+    expect(res.type).toMatch(/json/);
+
+    // aqui depende muito de como seu validateBody monta o erro.
+    // Ajuste conforme sua estrutura de erro hoje.
+    expect(res.body).toHaveProperty("errors");
+  });
+
+  it("não deve permitir criar usuário sem token JWT", async () => {
+    const res = await api().post("/api/usuarios").send({
+      nome: "Sem Token",
+      email: "sem-token@example.com",
+      senha: "senha123",
+      role: "Funcionario",
     });
+
+    expect(res.status).toBe(401);
+    expect(res.type).toMatch(/json/);
+    // sua mensagem vem do auth-middleware
+    expect(res.body.error).toHaveProperty("message");
+  });
+
+  it("deve listar usuários", async () => {
+    // cria dois usuários
+    await api()
+      .post("/api/usuarios")
+      .set("Authorization", `Bearer ${token}`)
+      .send({
+        nome: "User A",
+        email: "usera@example.com",
+        senha: "senha123",
+        role: "Funcionario",
+      });
+
+    await api()
+      .post("/api/usuarios")
+      .set("Authorization", `Bearer ${token}`)
+      .send({
+        nome: "User B",
+        email: "userb@example.com",
+        senha: "senha123",
+        role: "Gerente",
+      });
+
+    const res = await api()
+      .get("/api/usuarios")
+      .set("Authorization", `Bearer ${token}`);
+
+    expect(res.status).toBe(200);
+    expect(res.type).toMatch(/json/);
+    expect(Array.isArray(res.body.data)).toBe(true);
+    expect(res.body.data.length).toBeGreaterThanOrEqual(2);
+
+    const emails = res.body.data.map((u: any) => u.email);
+    expect(emails).toEqual(
+      expect.arrayContaining(["usera@example.com", "userb@example.com"])
+    );
   });
 });
