@@ -77,7 +77,7 @@ export class LoginController implements Controller {
         },
       } as any; // se o schema Zod ainda não estiver igual, depois a gente alinha
 
-      const resource = resourceOf(responseData)
+      const resource = resourceOf<AuthResponseDTO>(responseData)
         .addLink("self", "POST", "/login")
         .addLink("refresh-token", "POST", "/refresh-token")
         // rota futura, só manter se fizer sentido no seu domínio
