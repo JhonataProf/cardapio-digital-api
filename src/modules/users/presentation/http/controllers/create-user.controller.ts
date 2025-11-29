@@ -6,11 +6,19 @@ import { serverError } from "@/helpers/http-helper";
 import { CreateUserDTO } from "@/types/usuarios";
 import { resourceOf } from "@/helpers/hateoas";
 import { logger } from "@/config/logger";
+import { mapErrorToHttpResponse } from "@/shared/http/http-error-response";
 
 export class CreateUserController implements Controller {
   constructor(private readonly useCase: CreateUserUseCase) {}
 
   async handle(httpRequest: HttpRequest): Promise<HttpResponse> {
+    const correlationId = httpRequest.correlationId;
+
+    logger.info("Iniciando criação de usuário", {
+      correlationId,
+      route: "CreateUserController",
+      body: httpRequest.body,
+    });
     try {
       const body = httpRequest.body as CreateUserDTO;
 
@@ -29,36 +37,22 @@ export class CreateUserController implements Controller {
         }
       );
 
-      logger.debug("CreateUserController: usuário criado", {
+      logger.info("Usuário criado com sucesso", {
+        correlationId,
+        route: "CreateUserController",
         userId: user.id,
+        email: user.email,
       });
 
       return created(resourceResp);
     } catch (error) {
-      if (error instanceof Error && error.message === "EMAIL_ALREADY_IN_USE") {
-        const resource = resourceOf({
-          error: {
-            code: "EMAIL_ALREADY_IN_USE",
-            message: "Já existe um usuário cadastrado com este email",
-          },
-        })
-          .addLink("self", "POST", "/usuarios")
-          .build();
-
-        return {
-          statusCode: 409, // Conflict
-          body: resource,
-        };
-      }
-
-      logger.error("CreateUserController: erro inesperado", {
-        error:
-          error instanceof Error
-            ? { message: error.message, stack: error.stack }
-            : error,
+      logger.error("Erro ao criar usuário", {
+        correlationId,
+        route: "CreateUserController",
+        error,
       });
 
-      return serverError(error as Error);
+      return mapErrorToHttpResponse(error, correlationId);
     }
   }
 }

@@ -78,8 +78,8 @@ describe("Users API (integration)", () => {
     // se depois migrar para 409/Resource, é só ajustar aqui
     expect(dup.status).toBe(409);
     expect(dup.type).toMatch(/json/);
-    expect(dup.body.data.error).toHaveProperty("code");
-    expect(dup.body.data.error).toHaveProperty("message");
+    expect(dup.body).toHaveProperty("error.code", "EMAIL_ALREADY_IN_USE");
+    expect(dup.body).toHaveProperty("meta.correlationId");
   });
 
   it("deve validar corpo da requisição (Zod) ao criar usuário", async () => {
