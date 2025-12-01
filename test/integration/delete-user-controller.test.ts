@@ -12,7 +12,7 @@ describe("Delete User Controller", () => {
   beforeEach(async () => {
     await resetDb();
     const auth = await seedUserAndLogin(); // cria um usuário (provavelmente Gerente) e faz login
-    token = auth.token;
+    token = auth.accessToken;
   });
 
   afterAll(async () => {

@@ -1,4 +1,3 @@
-import { Tokenizer } from "@/adapters/token-adapter";
 import { logger } from "@/config/logger";
 import { resourceOf } from "@/helpers/hateoas";
 import {
@@ -7,6 +6,7 @@ import {
   serverError,
   unauthorizedResource,
 } from "@/helpers/http-helper";
+import { Tokenizer } from "@/interfaces";
 import User from "@/models/user-model";
 import { Controller, HttpRequest, HttpResponse } from "@/protocols";
 import { AuthResponseDTO, RefreshTokenDTO } from "@/types/login";

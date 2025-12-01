@@ -1,7 +1,6 @@
 // src/service/login-service.ts
 import { logger } from "@/config/logger";
-import { Tokenizer } from "../adapters/token-adapter";
-import { Encrypter } from "../interfaces";
+import { Encrypter, Tokenizer } from "../interfaces";
 import Cliente from "../models/cliente-model";
 import Funcionario from "../models/funcionario-model";
 import Gerente from "../models/gerente-model";

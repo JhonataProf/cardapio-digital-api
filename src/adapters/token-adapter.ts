@@ -1,12 +1,6 @@
 import jwt, { JwtPayload, SignOptions } from "jsonwebtoken";
 import { ENV } from "../config/env";
-
-export interface Tokenizer {
-  verifyToken(token: string): JwtPayload;
-  verifyRefreshToken(token: string): JwtPayload;
-  generateToken(payload: object): string;
-  generateRefreshToken(payload: object): string;
-}
+import { Tokenizer } from "@/interfaces";
 
 export class TokenAdapter implements Tokenizer {
   verifyRefreshToken(token: string): JwtPayload {

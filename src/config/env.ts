@@ -5,11 +5,16 @@ import * as z from "zod";
 // Carrega o .env específico por ambiente (ex.: .env.test nos testes)
 const envFile = process.env.NODE_ENV ? `.env.${process.env.NODE_ENV}` : ".env";
 dotenv.config({
-  path: [path.resolve(process.cwd(), envFile), path.resolve(process.cwd(), ".env")],
+  path: [
+    path.resolve(process.cwd(), envFile),
+    path.resolve(process.cwd(), ".env"),
+  ],
 });
 
 const EnvSchema = z.object({
-  NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
+  NODE_ENV: z
+    .enum(["development", "test", "production"])
+    .default("development"),
   PORT: z.coerce.number().int().positive().default(3000),
 
   API_VERSION: z.string().default("v1"),
@@ -18,9 +23,16 @@ const EnvSchema = z.object({
     .transform((v) => (typeof v === "string" ? v === "true" : Boolean(v)))
     .default(true),
 
-  JWT_SECRET: z.string().min(16, "JWT_SECRET deve ter pelo menos 16 caracteres"),
+  JWT_SECRET: z
+    .string()
+    .min(16, "JWT_SECRET deve ter pelo menos 16 caracteres"),
+  JWT_ACCESS_SECRET: z
+    .string()
+    .min(16, "JWT_ACCESS_SECRET deve ter pelo menos 16 caracteres"),
   JWT_EXPIRES_IN: z.string().default("1h"),
-  JWT_REFRESH_SECRET: z.string().min(16, "JWT_REFRESH_SECRET deve ter pelo menos 16 caracteres"),
+  JWT_REFRESH_SECRET: z
+    .string()
+    .min(16, "JWT_REFRESH_SECRET deve ter pelo menos 16 caracteres"),
   JWT_REFRESH_EXPIRES_IN: z.string().default("7d"),
 
   UPDATE_MODEL: z
@@ -30,7 +42,9 @@ const EnvSchema = z.object({
 
   SALT: z.coerce.number().int().positive().default(10),
 
-  DB_DIALECT: z.enum(["mysql", "mariadb", "postgres", "sqlite"]).default("mysql"),
+  DB_DIALECT: z
+    .enum(["mysql", "mariadb", "postgres", "sqlite"])
+    .default("mysql"),
   DB_HOST: z.string().default("127.0.0.1"),
   DB_PORT: z.coerce.number().int().positive().default(3306),
   DB_DATABASE: z.string().default("db_app"),
@@ -40,7 +54,10 @@ const EnvSchema = z.object({
 
 const parsed = EnvSchema.safeParse(process.env);
 if (!parsed.success) {
-  console.error("Falha ao validar variáveis de ambiente:", parsed.error.flatten().fieldErrors);
+  console.error(
+    "Falha ao validar variáveis de ambiente:",
+    parsed.error.flatten().fieldErrors
+  );
   process.exit(1);
 }
 

@@ -8,7 +8,7 @@ servers:
     description: Servidor local
 
 tags:
-  - name: Users
+  - name: Usuarios
     description: Operações relacionadas a usuários
   - name: Pratos
     description: Operações relacionadas a pratos
@@ -18,10 +18,10 @@ tags:
     description: Operações relacionadas a pedidos
 
 paths:
-  /api/users:
+  /api/usuarios:
     post:
       summary: Cria um novo usuário
-      tags: [Users]
+      tags: [Usuarios]
       security:
         - bearerAuth: []
       requestBody:
@@ -39,10 +39,10 @@ paths:
                 $ref: "#/components/schemas/CreateUserResponseDTO"
         500:
           description: Algum erro aconteceu
-  /api/users/{id}:
+  /api/usuarios/{id}:
     get:
       summary: Retorna um usuário pelo ID
-      tags: [Users]
+      tags: [Usuarios]
       security:
         - bearerAuth: []
       parameters:
@@ -65,7 +65,7 @@ paths:
           description: Algum erro aconteceu
     put:
       summary: Atualiza um usuário pelo ID
-      tags: [Users]
+      tags: [Usuarios]
       security:
         - bearerAuth: []
       parameters:
@@ -94,7 +94,7 @@ paths:
           description: Algum erro aconteceu
     delete:
       summary: Deleta um usuário pelo ID
-      tags: [Users]
+      tags: [Usuarios]
       security:
         - bearerAuth: []
       parameters:

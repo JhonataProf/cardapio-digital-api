@@ -26,7 +26,12 @@ export async function seedUserAndLogin({
   // Asserte aqui para falhar cedo se o login quebrar
   expect(resp.status).toBe(200);
   expect(resp.type).toMatch(/json/);
-  expect(resp.body.data).toHaveProperty("token");
+  expect(resp.body.data).toHaveProperty("accessToken");
+  expect(resp.body.data).toHaveProperty("refreshToken");
 
-  return { user, token: resp.body.data.token };
+  return {
+    user,
+    accessToken: resp.body.data.accessToken,
+    refreshToken: resp.body.data.refreshToken,
+  };
 }
