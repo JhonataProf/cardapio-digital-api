@@ -41,7 +41,7 @@ Cliente.init(
   },
   {
     sequelize,
-    modelName: "Cliente",
+    modelName: "Clientes",
   }
 );
 Cliente.belongsTo(User, { foreignKey: "userId", as: "user" });

@@ -1,16 +1,28 @@
+import sequelize from "@/database";
+import { Encrypter } from "@/interfaces";
+import { UserEntity } from "@/modules/users/domain/entities/user.entity";
+import { ProfileStrategyFactory } from "@/modules/users/domain/profile/profile-strategy-factory";
 import { CreateUserRepository } from "@/modules/users/domain/repositories/create-user.repository";
 import { FindUserByEmailRepository } from "@/modules/users/domain/repositories/find-user-by-email.repository";
-import { UserEntity } from "@/modules/users/domain/entities/user.entity";
-import { CreateUserDTO } from "@/types/usuarios";
-import { Encrypter } from "@/interfaces";
-import { emailAlreadyInUse } from "@/modules/users/domain/errors/user-errors";
+import { AppError } from "@/shared/errors-app-error";
 import { DomainLogger, NoopDomainLogger } from "@/shared/logger/domain-logger";
+
+interface CreateUserDTO {
+  nome: string;
+  email: string;
+  senha: string;
+  role: "Gerente" | "Funcionario" | "Cliente";
+  // campos extras para perfil
+  clienteTelefone?: string;
+  clienteEndereco?: string;
+}
 
 export class CreateUserUseCase {
   constructor(
     private readonly createUserRepo: CreateUserRepository,
     private readonly findByEmailRepo: FindUserByEmailRepository,
     private readonly encrypter: Encrypter,
+    private readonly profileStrategyFactory = new ProfileStrategyFactory(),
     private readonly logger: DomainLogger = new NoopDomainLogger()
   ) {}
 
@@ -23,28 +35,53 @@ export class CreateUserUseCase {
     const existing = await this.findByEmailRepo.findByEmail(dto.email);
 
     if (existing) {
-      this.logger.info("Email já está em uso", { email: dto.email });
-      throw emailAlreadyInUse(dto.email);
+      throw new AppError({
+        code: "EMAIL_ALREADY_IN_USE",
+        message: `O e-mail ${dto.email} já está em uso`,
+        statusCode: 409,
+        details: { email: dto.email },
+      });
     }
 
     const hashed = await this.encrypter.hash(dto.senha);
 
-    const user = new UserEntity({
-      id: 0, // vai ser setado pelo repo
-      nome: dto.nome,
-      email: dto.email,
-      senha: hashed,
-      role: dto.role,
-    });
+    const transaction = await sequelize.transaction();
+    try {
+      const user = new UserEntity({
+        id: 0,
+        nome: dto.nome,
+        email: dto.email,
+        senha: hashed,
+        role: dto.role,
+      });
 
-    const created = await this.createUserRepo.create(user);
+      const created = await this.createUserRepo.create(user, transaction);
 
-    this.logger.info("Usuário criado com sucesso", {
-      userId: created.id,
-      email: created.email,
-      role: created.role,
-    });
+      const strategy = this.profileStrategyFactory.getStrategy(
+        user.role as any
+      );
 
-    return created;
+      await strategy.createProfile({
+        user,
+        payload: dto,
+      });
+
+      this.logger.info("Usuário + perfil criados com sucesso", {
+        userId: created.id,
+        email: created.email,
+        role: created.role,
+      });
+
+      transaction.commit();
+      return created;
+    } catch (error) {
+      this.logger.error("Erro ao criar usuário + perfil", {
+        error,
+        email: dto.email,
+        role: dto.role,
+      });
+      transaction.rollback();
+      throw error;
+    }
   }
 }

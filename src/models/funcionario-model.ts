@@ -42,7 +42,7 @@ Funcionario.init(
   },
   {
     sequelize,
-    modelName: "Funcionario",
+    modelName: "Funcionarios",
   }
 );
 Funcionario.belongsTo(User, { foreignKey: "userId", as: "user" });

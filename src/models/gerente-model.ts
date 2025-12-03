@@ -37,7 +37,7 @@ Gerente.init(
   },
   {
     sequelize,
-    modelName: "Gerente",
+    modelName: "Gerentes",
   }
 );
 Gerente.belongsTo(User, { foreignKey: "userId", as: "user" });

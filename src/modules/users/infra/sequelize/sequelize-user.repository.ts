@@ -8,6 +8,7 @@ import {
   UpdateUserRepository,
   DeleteUserRepository,
 } from "../../domain/repositories";
+import { Transaction } from "sequelize";
 
 export class SequelizeUserRepository
   implements
@@ -18,14 +19,15 @@ export class SequelizeUserRepository
     UpdateUserRepository,
     DeleteUserRepository
 {
-  async create(user: UserEntity): Promise<UserEntity> {
+  async create(user: UserEntity, t?: Transaction): Promise<UserEntity> {
     const created = await UserModel.create({
       nome: user.nome,
       email: user.email,
       senha: user.senha,
       role: user.role,
-    });
+    }, { transaction: t });
 
+    await UserModel.sync();
     return new UserEntity({
       id: created.id,
       nome: created.nome,
