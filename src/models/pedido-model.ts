@@ -1,14 +1,16 @@
 import { DataTypes, Model } from "sequelize";
 import sequelize from "../database";
+import { User } from "./user-model";
 
 export class Pedido extends Model {
   id!: number;
+  codigo!: string;
+  userId!: number;
   cliente_nome!: string;
   cliente_endereco!: string;
   cliente_telefone!: string;
   prato_id!: number;
   quantidade!: number;
-  total!: number;
   status!: "CRIADO" | "PAGO" | "ATUALIZADO" | "CANCELADO";
 }
 
@@ -18,6 +20,19 @@ Pedido.init(
       type: DataTypes.INTEGER,
       autoIncrement: true,
       primaryKey: true,
+    },
+    codigo: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: false
+    },
+    userId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: "Users", // Nome do modelo alvo
+        key: "id", // Chave no modelo alvo que estamos referenciando
+      },
     },
     cliente_nome: {
       type: DataTypes.STRING,
@@ -43,10 +58,6 @@ Pedido.init(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    total: {
-      type: DataTypes.FLOAT,
-      allowNull: false,
-    },
     status: {
       type: DataTypes.ENUM("CRIADO", "PAGO", "ATUALIZADO", "CANCELADO"),
       defaultValue: "CRIADO",
@@ -58,4 +69,5 @@ Pedido.init(
     modelName: "Pedido",
   }
 );
+Pedido.belongsTo(User, { foreignKey: "userId", as: "user" });
 export default Pedido;

@@ -78,14 +78,20 @@ export class UsuarioService {
       senha: senhaCriptografada,
       role,
     });
-
     await this.__criarPerfil({ userId: usuario.id, role, nome, telefone: dadosUsuario?.telefone });
+    await User.sync();
+    const usuarioCriado = await User.findByPk(usuario.id);
+    if(!usuarioCriado) {
+      throw new Error("Erro ao criar usuário");
+    }
     return {
-      id: usuario.id,
-      nome: usuario.nome,
-      email: usuario.email,
-      role: usuario.role,
+      id: usuarioCriado?.id,
+      nome: usuarioCriado?.nome,
+      email: usuarioCriado.email,
+      role: usuarioCriado?.role,
+      telefone: dadosUsuario.telefone,
     };
+
   }
 
   async __buscarPerfilPorUserId(userId: number) {

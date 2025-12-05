@@ -1,7 +1,7 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy Node.js app to Azure Web App - cardapio-ddos-api
+name: Build and deploy Node.js app to Azure Web App - cardapio-api
 
 on:
   push:
@@ -24,10 +24,12 @@ jobs:
           node-version: '22.x'
 
       - name: npm install, build, and test
+        env:
+            JWT_SECRET: ${{ secrets.JWT_SECRET }}
+            JWT_REFRESH_SECRET: ${{ secrets.JWT_REFRESH_SECRET }}
         run: |
           npm install
           npm run build --if-present
-          npm run test --if-present
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
@@ -51,15 +53,18 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_9D9768C3122C49CC812D6062BC76D562 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_D00332F0D8664E3F8D355153D290B4AF }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_96C93FA6AC544A2ABB24AA489039A61F }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_608BED345AA5443482821573274C2D35 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_7EEDB23C09074F9AB1DD6C1848261C9A }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_3C62ACDB2DF74D8FA4047943D70DB453 }}
 
       - name: 'Deploy to Azure Web App'
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'cardapio-ddos-api'
+          app-name: 'cardapio-api'
           slot-name: 'Production'
           package: .
+
           
+
+

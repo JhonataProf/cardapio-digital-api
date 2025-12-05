@@ -6,7 +6,7 @@ export class ListarPedidoController implements Controller {
   async handle(httpRequest: HttpRequest): Promise<HttpResponse> {
     try {
       const pedidoService = new PedidoService();
-      const pedidos = pedidoService.getPedidos();
+      const pedidos = await pedidoService.getPedidos();
       return ok(pedidos);
     } catch (error: any) {
       return serverError(error);

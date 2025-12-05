@@ -5,7 +5,7 @@ import { authMiddleware } from "../middlewares";
 
 export default (router: Router): void => {
   router.get(
-    "/pedidos/{id}",
+    "/pedidos/{:id}",
     authMiddleware,
     adaptRoute(new BuscarPedidoController())
   );
