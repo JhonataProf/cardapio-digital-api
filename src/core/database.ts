@@ -1,5 +1,5 @@
 import { Dialect, Sequelize } from "sequelize";
-import { ENV } from "@/config/env";
+import { ENV } from "@/core/config/env";
 
 const isTest = ENV.NODE_ENV === "test";
 

@@ -1,11 +1,11 @@
-import { unAuthorizedError } from "../../errors/unauthorized-error";
+import { unAuthorizedError } from "@/core/errors/unauthorized-error";
 import {
   notFound,
   ok,
   serverError,
   unAuthorized,
-} from "../../helpers/http-helper";
-import { Controller, HttpRequest, HttpResponse } from "../../protocols";
+} from "@/core/helpers/http-helper";
+import { Controller, HttpRequest, HttpResponse } from "@/core/protocols";
 import { LoginService } from "../../service/login-service";
 import { LoginDTO } from "../../types";
 

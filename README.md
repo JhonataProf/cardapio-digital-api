@@ -1109,12 +1109,12 @@ module.exports = DeletarUsuarioController;
 const express = require('express');
 const router = express.Router();
 const User = require('../models/user-model');
-const routeAdapter = require('../adapters/express-route-adapter');
+const routeAdapter = require('@/core/adapters/express-route-adapter');
 const CriarUsuarioController = require('../controllers/criar-usuario');
 const ListarUsuarioController = require('../controllers/listar-usuario');
 const EditarUsuarioController = require('../controllers/editar-usuario');
 const DeletarUsuarioController = require('../controllers/deletar-usuario');
-const adaptRoute = require('../adapters/express-route-adapter');
+const adaptRoute = require('@/core/adapters/express-route-adapter');
 
 /**
  * @swagger
@@ -1267,7 +1267,7 @@ module.exports = adaptRoute;
 ```javascript
 const express = require('express');
 const router = express.Router();
-const routeAdapter = require('../adapters/express-route-adapter');
+const routeAdapter = require('@/core/adapters/express-route-adapter');
 const LoginController = require('../controllers/login-controller');
 
 /**
@@ -1389,12 +1389,12 @@ module.exports = LoginController;
 ```javascript
 const express = require('express');
 const router = express.Router();
-const routeAdapter = require('../adapters/express-route-adapter');
+const routeAdapter = require('@/core/adapters/express-route-adapter');
 const CriarUsuarioController = require('../controllers/criar-usuario');
 const ListarUsuarioController = require('../controllers/listar-usuario');
 const EditarUsuarioController = require('../controllers/editar-usuario');
 const DeletarUsuarioController = require('../controllers/deletar-usuario');
-const authMiddleware = require('../middlewares/auth-middleware');
+const authMiddleware = require('@/core/middlewares/auth-middleware');
 
 /**
  * @swagger

@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import { Encrypter } from "../interfaces";
+import { Encrypter } from "@/core/interfaces";
 
 export class BcryptAdapter implements Encrypter {
   private readonly saltRounds: number;

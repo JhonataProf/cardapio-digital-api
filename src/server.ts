@@ -1,6 +1,6 @@
-import { ENV } from "@/config/env";
-import { initializeDatabaseAndServer } from "@/config/initializeDatabaseAndServer";
-import sequelize from "./database";
+import { ENV } from "@/core/config/env";
+import { initializeDatabaseAndServer } from "@/core/config/initializeDatabaseAndServer";
+import sequelize from "./core/database";
 // deve ser a primeira coisa a rodar em prod
 if (process.env.NODE_ENV === "production") {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -8,7 +8,7 @@ if (process.env.NODE_ENV === "production") {
 }
 async function start() {
   try {
-    const app = (await import("@/config/app")).default;
+    const app = (await import("@/core/config/app")).default;
 
     await initializeDatabaseAndServer(sequelize);
 

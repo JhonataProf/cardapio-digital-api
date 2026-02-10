@@ -1,8 +1,8 @@
-import { BcryptAdapter } from "@/adapters/bcrypt-adapter";
-import { TokenAdapter } from "@/adapters/token-adapter";
-import { ENV } from "@/config/env";
+import { BcryptAdapter } from "@/core/adapters/bcrypt-adapter";
+import { TokenAdapter } from "@/core/adapters/token-adapter";
+import { ENV } from "@/core/config/env";
 import LoginController from "@/controllers/login/login";
-import { Controller } from "@/protocols";
+import { Controller } from "@/core/protocols";
 import { LoginService } from "@/service/login-service";
 
 export const LoginControllerFactory = (): Controller => {

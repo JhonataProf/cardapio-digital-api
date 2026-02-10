@@ -1,5 +1,5 @@
 import { Router } from "express";
-import adaptRoute from "../adapters/express-route-adapter";
+import adaptRoute from "@/core/adapters/express-route-adapter";
 import ListarPratoController from "../controllers/prato/listar-prato";
 
 export default (router: Router): void => {

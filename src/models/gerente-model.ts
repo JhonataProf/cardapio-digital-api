@@ -1,5 +1,5 @@
 import { DataTypes, Model } from "sequelize";
-import sequelize from "../database";
+import sequelize from "../core/database";
 import User from "./user-model";
 
 class Gerente extends Model {

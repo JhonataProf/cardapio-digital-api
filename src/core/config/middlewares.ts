@@ -1,5 +1,5 @@
 import { Express } from "express";
-import { securityHeaders, cors, bodyParser, contentType } from "@/middlewares";
+import { securityHeaders, cors, bodyParser, contentType } from "@/core/middlewares";
 
 export default (app: Express): void => {
   // Ordem importa:

@@ -1,5 +1,5 @@
-import { Tokenizer } from "../adapters/token-adapter";
-import { Encrypter } from "../interfaces";
+import { Tokenizer } from "@/core/adapters/token-adapter";
+import { Encrypter } from "@/core/interfaces";
 import Cliente from "../models/cliente-model";
 import Funcionario from "../models/funcionario-model";
 import Gerente from "../models/gerente-model";

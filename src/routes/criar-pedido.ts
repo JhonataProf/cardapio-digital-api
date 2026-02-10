@@ -1,7 +1,7 @@
 import { Router } from "express";
-import adaptRoute from "../adapters/express-route-adapter";
+import adaptRoute from "@/core/adapters/express-route-adapter";
 import { CriarPedidoController } from "../controllers/pedido/criar-pedido";
-import { authMiddleware } from "../middlewares";
+import { authMiddleware } from "@/core/middlewares";
 
 export default (router: Router): void => {
   router.post(

@@ -1,4 +1,4 @@
-import { BcryptAdapter } from "@/adapters/bcrypt-adapter";
+import { BcryptAdapter } from "@/core/adapters/bcrypt-adapter";
 import Cliente from "@/models/cliente-model";
 import { StatusPedido } from "../enums/status-pedido";
 import PedidoModel from "../models/pedido-model";

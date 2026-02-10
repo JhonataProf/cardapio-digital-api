@@ -1,6 +1,6 @@
-import sequelize from "../database";
+import sequelize from "../core/database";
 import { Role } from "../enums/role";
-import { Encrypter } from "../interfaces";
+import { Encrypter } from "@/core/interfaces";
 import Cliente from "../models/cliente-model";
 import Funcionario from "../models/funcionario-model";
 import Gerente from "../models/gerente-model";

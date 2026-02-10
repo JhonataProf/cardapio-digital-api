@@ -1,6 +1,6 @@
-import { notFound, ok, serverError } from "../../helpers/http-helper";
+import { notFound, ok, serverError } from "@/core/helpers/http-helper";
 import Prato from "../../models/prato-model";
-import { Controller, HttpRequest, HttpResponse } from "../../protocols";
+import { Controller, HttpRequest, HttpResponse } from "@/core/protocols";
 
 export default class DeletarPratoController implements Controller {
   async handle(httpRequest: HttpRequest): Promise<HttpResponse> {

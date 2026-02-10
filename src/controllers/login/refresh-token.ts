@@ -1,12 +1,12 @@
-import { TokenAdapter } from "../../adapters/token-adapter";
+import { TokenAdapter } from "@/core/adapters/token-adapter";
 import {
   forbidden,
   notFound,
   ok,
   serverError,
-} from "../../helpers/http-helper";
+} from "@/core/helpers/http-helper";
 import User from "../../models/user-model";
-import { Controller, HttpRequest, HttpResponse } from "../../protocols";
+import { Controller, HttpRequest, HttpResponse } from "@/core/protocols";
 import { RefreshTokenDTO } from "../../types";
 
 class RefreshTokenController implements Controller {
