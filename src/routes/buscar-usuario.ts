@@ -1,14 +1,14 @@
 import { Router } from "express";
 import adaptRoute from "@/core/adapters/express-route-adapter";
-import { DeleteUserControllerFactory } from "@/factories/controller/usuario/delete-user-controller-factory";
+import { GetUserByIdControllerFactory } from "@/factories/controller/usuario/get-user-by-id-controller-factory";
 // import authMiddleware from "@/middlewares/auth-middleware";
 // import authorizeRoles from "@/middlewares/authorize-roles";
 
 export default (router: Router): void => {
-  router.delete(
+  router.get(
     "/usuarios/:id",
     // authMiddleware,
     // authorizeRoles(["Gerente"]),
-    adaptRoute(DeleteUserControllerFactory())
+    adaptRoute(GetUserByIdControllerFactory())
   );
 };

@@ -23,7 +23,7 @@ export class PedidoService {
       const dtoCliente = await usuarioService.criarUsuario({
         nome: `Cliente_${Date.now()}`,
         email: `cliente_${Date.now()}@senac.dou.com`,
-        telefone: dto.clienteTelefone,
+        // telefone: dto.clienteTelefone,
         senha: "cliente123",
         role: "Cliente",
       });
