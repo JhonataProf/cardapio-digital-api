@@ -3,7 +3,9 @@ import Cliente from "@/modules/users/infra/model/cliente-model";
 import { StatusPedido } from "../enums/status-pedido";
 import PedidoModel from "../models/pedido-model";
 import { CreatePedidoDTO, PedidoItemDTO, UpdatePedidoDTO } from "../types";
-import { UsuarioService } from "./usuario-service";
+import { CreateUserUseCase } from "@/modules/users/application/use-cases/create-user.usecase";
+import User from "@/modules/users/infra/model/user-model";
+import { SequelizeUserRepository } from "@/modules/users/infra/sequelize/sequelize-user.repository";
 
 export class PedidoService {
   async createPedido(dto: CreatePedidoDTO) {
@@ -19,8 +21,9 @@ export class PedidoService {
     });
     if (!cliente) {
       const encrypter = new BcryptAdapter(12);
-      const usuarioService = new UsuarioService(encrypter);
-      const dtoCliente = await usuarioService.criarUsuario({
+      const createuserRepo = new SequelizeUserRepository();
+      const usuarioUseCase = new CreateUserUseCase(createuserRepo, createuserRepo, encrypter);
+      const dtoCliente = await usuarioUseCase.execute({
         nome: `Cliente_${Date.now()}`,
         email: `cliente_${Date.now()}@senac.dou.com`,
         // telefone: dto.clienteTelefone,

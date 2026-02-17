@@ -1,9 +1,8 @@
-import { Controller, HttpRequest, HttpResponse } from "@/core/protocols";
-import { ok, serverError } from "@/helpers/http-helper";
-import { ListUsersUseCase } from "../../../application/use-cases/list-users.usecase";
-import { resourceOf } from "@/helpers/hateoas";
 import { logger } from "@/core/config/logger";
+import { ok, serverError } from "@/core/helpers/http-helper";
 import { collection } from "@/core/http/http-resource";
+import { Controller, HttpRequest, HttpResponse } from "@/core/protocols";
+import { ListUsersUseCase } from "../../../application/use-cases/list-users.usecase";
 import { userLinks, usersCollectionLinks } from "../user-hateoas";
 
 export class ListUsersController implements Controller {

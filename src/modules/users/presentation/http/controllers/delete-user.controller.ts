@@ -1,8 +1,8 @@
-import { Controller, HttpRequest, HttpResponse } from "@/core/protocols";
-import { serverError } from "@/helpers/http-helper";
-import { DeleteUserUseCase } from "../../../application/use-cases/delete-user.usecase";
-import { resourceOf } from "@/helpers/hateoas";
 import { logger } from "@/core/config/logger";
+import { resourceOf } from "@/core/helpers/hateoas";
+import { serverError } from "@/core/helpers/http-helper";
+import { Controller, HttpRequest, HttpResponse } from "@/core/protocols";
+import { DeleteUserUseCase } from "../../../application/use-cases/delete-user.usecase";
 
 export class DeleteUserController implements Controller {
   constructor(private readonly useCase: DeleteUserUseCase) {}

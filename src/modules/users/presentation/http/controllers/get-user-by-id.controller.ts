@@ -1,8 +1,8 @@
-import { Controller, HttpRequest, HttpResponse } from "@/core/protocols";
-import { ok, serverError } from "@/helpers/http-helper";
-import { GetUserByIdUseCase } from "../../../application/use-cases/get-user-by-id.usecase";
-import { resourceOf } from "@/helpers/hateoas";
 import { logger } from "@/core/config/logger";
+import { resourceOf } from "@/core/helpers/hateoas";
+import { ok, serverError } from "@/core/helpers/http-helper";
+import { Controller, HttpRequest, HttpResponse } from "@/core/protocols";
+import { GetUserByIdUseCase } from "../../../application/use-cases/get-user-by-id.usecase";
 
 export class GetUserByIdController implements Controller {
   constructor(private readonly useCase: GetUserByIdUseCase) {}

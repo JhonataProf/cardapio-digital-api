@@ -1,9 +1,9 @@
-import { Controller, HttpRequest, HttpResponse } from "@/core/protocols";
-import { ok, serverError } from "@/helpers/http-helper";
-import { UpdateUserUseCase } from "../../../application/use-cases/update-user.usecase";
-import { UpdateUserDTO } from "@/types/usuarios";
-import { resourceOf } from "@/helpers/hateoas";
 import { logger } from "@/core/config/logger";
+import { resourceOf } from "@/core/helpers/hateoas";
+import { ok, serverError } from "@/core/helpers/http-helper";
+import { Controller, HttpRequest, HttpResponse } from "@/core/protocols";
+import { UpdateUserDTO } from "@/types/usuarios";
+import { UpdateUserUseCase } from "../../../application/use-cases/update-user.usecase";
 
 export class UpdateUserController implements Controller {
   constructor(private readonly useCase: UpdateUserUseCase) {}
