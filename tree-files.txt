@@ -1,4 +1,4 @@
-tree -a -I .*|node_modules|*lock|coverage
+tree -a -I '.*|node_modules|*lock|coverage' > tree-files.txt
 .
 ├── README.md
 ├── jest-integration-config.js
@@ -106,12 +106,8 @@ tree -a -I .*|node_modules|*lock|coverage
 │   │   ├── hateoas.ts
 │   │   └── http-helper.ts
 │   ├── models
-│   │   ├── cliente-model.ts
-│   │   ├── funcionario-model.ts
-│   │   ├── gerente-model.ts
 │   │   ├── pedido-model.ts
-│   │   ├── prato-model.ts
-│   │   └── user-model.ts
+│   │   └── prato-model.ts
 │   ├── modules
 │   │   ├── auth
 │   │   │   ├── application
@@ -124,7 +120,8 @@ tree -a -I .*|node_modules|*lock|coverage
 │   │   │   │   └── services
 │   │   │   │       └── auth-token.service.ts
 │   │   │   ├── infra
-│   │   │   │   └── jwt-auth-token.service.ts
+│   │   │   │   ├── jwt-auth-token.service.ts
+│   │   │   │   └── model
 │   │   │   └── presentation
 │   │   │       └── http
 │   │   │           ├── auth-hateoas.ts
@@ -162,6 +159,11 @@ tree -a -I .*|node_modules|*lock|coverage
 │   │       │       ├── list-users.repository.ts
 │   │       │       └── update-user.repository.ts
 │   │       ├── infra
+│   │       │   ├── model
+│   │       │   │   ├── cliente-model.ts
+│   │       │   │   ├── funcionario-model.ts
+│   │       │   │   ├── gerente-model.ts
+│   │       │   │   └── user-model.ts
 │   │       │   ├── profile
 │   │       │   │   ├── cliente-profile.strategy.ts
 │   │       │   │   ├── funcionario-profile.strategy.ts
@@ -254,4 +256,4 @@ tree -a -I .*|node_modules|*lock|coverage
 ├── tsconfig.json
 └── tsconfig.spec.json
 
-76 directories, 178 files
+78 directories, 178 files

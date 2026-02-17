@@ -1,5 +1,5 @@
 // tests/factories/user-factory.ts
-import User from "../../src/models/user-model";
+import User from "@/modules/users/infra/model/user-model";
 import { BcryptAdapter } from "@/core/adapters/bcrypt-adapter";
 import { ENV } from "@/core/config/env";
 
