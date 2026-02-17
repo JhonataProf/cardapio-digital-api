@@ -1,4 +1,4 @@
-import { noContent, serverError } from "@/core/helpers/http-helper";
+import { noContent, serverError } from "../../helpers/http-helper";
 import { Controller, HttpRequest, HttpResponse } from "@/core/protocols";
 import { PedidoService } from "../../service/pedido-service";
 

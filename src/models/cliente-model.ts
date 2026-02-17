@@ -1,5 +1,5 @@
 import { DataTypes, Model } from "sequelize";
-import sequelize from "../core/database";
+import sequelize from "@/core/database";
 import User from "./user-model";
 
 export class Cliente extends Model {
@@ -41,8 +41,8 @@ Cliente.init(
   },
   {
     sequelize,
-    modelName: "Cliente",
+    modelName: "Clientes",
   }
 );
-Cliente.belongsTo(User, { foreignKey: "userId", as: "user" });
+Cliente.belongsTo(User, { foreignKey: "userId", as: "user", onDelete: "CASCADE", onUpdate: "CASCADE" });
 export default Cliente;

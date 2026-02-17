@@ -1,7 +1,7 @@
 import { Controller, HttpRequest, HttpResponse } from "@/core/protocols";
-import { ok, serverError } from "@/core/helpers/http-helper";
+import { ok, serverError } from "@/helpers/http-helper";
 import { GetUserByIdUseCase } from "../../../application/use-cases/get-user-by-id.usecase";
-import { resourceOf } from "@/core/helpers/hateoas";
+import { resourceOf } from "@/helpers/hateoas";
 import { logger } from "@/core/config/logger";
 
 export class GetUserByIdController implements Controller {

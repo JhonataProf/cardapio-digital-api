@@ -11,8 +11,6 @@ export type UpdateUserDTO = z.infer<typeof updateUserSchema>;
 export type CreateUserDto = CreateUserDTO;
 export type UpdateUserDto = UpdateUserDTO;
 
-export type ResponseCreateUserDto = { id: number } & Partial<CreateUserDTO>;
-
 // Tipo básico de usuário “plain”
 export interface UserViewModel {
   id: number;

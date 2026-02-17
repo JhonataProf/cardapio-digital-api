@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { pt } from "zod/locales";
 z.config(pt());
+
 export const createUserSchema = z.object({
   nome: z
     .string({
@@ -10,12 +11,14 @@ export const createUserSchema = z.object({
           : "Nome deve ser uma string",
     })
     .min(3, "Nome deve ter pelo menos 3 caracteres"),
+
   email: z.email({
     error: (issue) =>
       issue.input === undefined
         ? "Email é obrigatório"
         : "Email deve ser uma string",
   }),
+
   senha: z
     .string({
       error: (issue) =>
@@ -24,28 +27,20 @@ export const createUserSchema = z.object({
           : "Senha deve ser uma string",
     })
     .min(6, "Senha deve ter pelo menos 6 caracteres"),
+
   role: z.enum(["Gerente", "Funcionario", "Cliente"], {
     error: (issue) => {
       if (
         !["Gerente", "Funcionario", "Cliente"].some(
-          (element) => element === issue.input,
+          (element) => element === issue.input
         )
       ) {
         return `A Role ${issue.input} é inválida`;
       }
     },
   }),
-  telefone: z
-    .string({
-      error: (issue) => {
-        if (typeof issue.input !== "string") {
-          return "Telefone deve ser uma string";
-        }
-      },
-    })
-    .min(10, "Telefone deve ter pelo menos 10 caracteres")
-    .optional(),
 });
+
 export const updateUserSchema = z.object({
   nome: z
     .string({
@@ -57,6 +52,7 @@ export const updateUserSchema = z.object({
     })
     .min(3, "Nome deve ter pelo menos 3 caracteres")
     .optional(),
+
   email: z
     .email({
       error: (issue) =>
@@ -65,6 +61,7 @@ export const updateUserSchema = z.object({
           : "Email inválido",
     })
     .optional(),
+
   senha: z
     .string({
       error: (issue) => {
@@ -75,12 +72,13 @@ export const updateUserSchema = z.object({
     })
     .min(6, "Senha deve ter pelo menos 6 caracteres")
     .optional(),
+
   role: z
     .enum(["Gerente", "Funcionario", "Cliente"], {
       error: (issue) => {
         if (
           !["Gerente", "Funcionario", "Cliente"].some(
-            (element) => element === issue.input,
+            (element) => element === issue.input
           )
         ) {
           return `A Role ${issue.input} é inválida`;

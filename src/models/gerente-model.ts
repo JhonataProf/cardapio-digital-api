@@ -1,5 +1,5 @@
 import { DataTypes, Model } from "sequelize";
-import sequelize from "../core/database";
+import sequelize from "@/core/database";
 import User from "./user-model";
 
 class Gerente extends Model {
@@ -37,8 +37,8 @@ Gerente.init(
   },
   {
     sequelize,
-    modelName: "Gerente",
+    modelName: "Gerentes",
   }
 );
-Gerente.belongsTo(User, { foreignKey: "userId", as: "user" });
+Gerente.belongsTo(User, { foreignKey: "userId", as: "user", onDelete: "CASCADE", onUpdate: "CASCADE" });
 export default Gerente;

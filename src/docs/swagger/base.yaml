@@ -1,12 +1,18 @@
 openapi: 3.0.3
 info:
-  title: Cardápio SENAC API
   version: 1.0.0
-
+  title: API de Gerenciamento de Usuários e Pratos
+  description: Esta é uma API para gerenciar usuários e pratos com autenticação JWT.
 servers:
   - url: http://localhost:3000/api
+    description: Servidor local
 
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   schemas:
     Link:
       type: object

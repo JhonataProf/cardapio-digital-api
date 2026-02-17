@@ -13,7 +13,7 @@ export class PedidoService {
     dto.itens.forEach((i) => {
       if (!i.produtoId || i.quantidade < 1 || i.precoUnitario < 0)
         throw new Error("Item inválido");
-    })
+    });
     let cliente = await Cliente.findOne({
       where: { telefone: dto.clienteTelefone },
     });
@@ -27,7 +27,10 @@ export class PedidoService {
         senha: "cliente123",
         role: "Cliente",
       });
-      cliente = await usuarioService.__buscarPerfilPorUserId(dtoCliente.id) as Cliente;
+      // const clienteId = dtoCliente.id!
+      // cliente = (await usuarioService.__buscarPerfilPorUserId(
+      //   dtoCliente?.id
+      // )) as Cliente;
     }
     if (!cliente) {
       throw new Error("Erro ao criar cliente");

@@ -1,29 +1,38 @@
+// src/config/initializeDatabaseAndServer.ts
 import fs from "fs";
 import path from "path";
 import { Sequelize } from "sequelize";
 import { ENV } from "./env";
+import { logger } from "@/core/config/logger";
 
 export const initializeDatabaseAndServer = async (sequelize: Sequelize) => {
-  if (!ENV.UPDATE_MODEL) return; // evita sobrescrita se flag estiver habilitada
+  if (!ENV.UPDATE_MODEL) {
+    logger.info("DB init skipped because ENV.UPDATE_MODEL is disabled");
+    return;
+  }
 
   try {
-    const modelsPath = path.resolve(__dirname, "../models");
+    const modelsPath = path.resolve(__dirname, "../../models");
+
     if (!fs.existsSync(modelsPath)) {
-      console.warn("Pasta de models não encontrada:", modelsPath);
+      logger.warn("Models folder not found", { modelsPath });
       return;
     }
 
-    const exts =
-      process.env.NODE_ENV === "production" ? [".js"] : [".ts", ".js"];
+    const exts = ENV.NODE_ENV === "production" ? [".js"] : [".ts", ".js"];
+
     const modelFiles = fs
       .readdirSync(modelsPath)
       .filter((file) => exts.some((ext) => file.endsWith(`-model${ext}`)));
 
     const db: Record<string, any> = { sequelize, Sequelize };
 
+    logger.info("Loading Sequelize models", { modelsPath, modelFiles });
+
     // Carrega models
     for (const file of modelFiles) {
-      const mod = await import(path.join(modelsPath, file));
+      const fullPath = path.join(modelsPath, file);
+      const mod = await import(fullPath);
       const model = mod.default ?? mod;
       const modelName = file.replace(/-model\.(ts|js)$/, "");
       db[modelName] = model;
@@ -36,21 +45,26 @@ export const initializeDatabaseAndServer = async (sequelize: Sequelize) => {
       }
     });
 
+    logger.info("Authenticating DB connection...");
     await sequelize.authenticate();
-    console.log("Conexão com o banco de dados estabelecida.");
+    logger.info("DB connection established");
 
-    // Em produção: sem force/alter; em dev: alter opcional; em test: geralmente recria
     const syncOptions =
       ENV.NODE_ENV === "production"
         ? {}
         : ENV.NODE_ENV === "test"
-        ? { force: true }
-        : { alter: true };
+        ? { force: true } // recria para testes
+        : { alter: true }; // dev: atualiza schema sem perder dados (ainda assim com cuidado)
+
+    logger.info("Syncing database schema", { syncOptions });
 
     await sequelize.sync(syncOptions);
-    console.log("Banco sincronizado.");
+    logger.info("Database schema synchronized successfully");
   } catch (err) {
-    console.error("Erro ao inicializar DB:", err);
-    throw err;
+    logger.error("Error during DB initialization", {
+      error:
+        err instanceof Error ? { message: err.message, stack: err.stack } : err,
+    });
+    throw err; // importante propagar para o server decidir se sobe ou não
   }
 };

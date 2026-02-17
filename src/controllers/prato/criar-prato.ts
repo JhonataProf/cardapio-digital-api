@@ -1,4 +1,4 @@
-import { created, serverError } from "@/core/helpers/http-helper";
+import { created, serverError } from "../../helpers/http-helper";
 import { Controller, HttpRequest, HttpResponse } from "@/core/protocols";
 import { PratoService } from "../../service/prato-service";
 

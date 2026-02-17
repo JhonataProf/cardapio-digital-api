@@ -1,7 +1,7 @@
 import { Controller, HttpRequest, HttpResponse } from "@/core/protocols";
-import { serverError } from "@/core/helpers/http-helper";
+import { serverError } from "@/helpers/http-helper";
 import { DeleteUserUseCase } from "../../../application/use-cases/delete-user.usecase";
-import { resourceOf } from "@/core/helpers/hateoas";
+import { resourceOf } from "@/helpers/hateoas";
 import { logger } from "@/core/config/logger";
 
 export class DeleteUserController implements Controller {

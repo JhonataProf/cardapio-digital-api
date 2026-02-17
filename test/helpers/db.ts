@@ -1,5 +1,5 @@
 // tests/helpers/db.ts
-import sequelize from "../../src/database";
+import sequelize from "@/core/database";
 
 export async function resetDb() {
   // Limpa todas as tabelas e reinicia IDs

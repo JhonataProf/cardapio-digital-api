@@ -1,8 +1,8 @@
 import { Controller, HttpRequest, HttpResponse } from "@/core/protocols";
-import { ok, serverError } from "@/core/helpers/http-helper";
+import { ok, serverError } from "@/helpers/http-helper";
 import { UpdateUserUseCase } from "../../../application/use-cases/update-user.usecase";
 import { UpdateUserDTO } from "@/types/usuarios";
-import { resourceOf } from "@/core/helpers/hateoas";
+import { resourceOf } from "@/helpers/hateoas";
 import { logger } from "@/core/config/logger";
 
 export class UpdateUserController implements Controller {

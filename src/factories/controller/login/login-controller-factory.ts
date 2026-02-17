@@ -1,13 +1,23 @@
+// src/factories/controller/login/login-controller-factory.ts
+
 import { BcryptAdapter } from "@/core/adapters/bcrypt-adapter";
-import { TokenAdapter } from "@/core/adapters/token-adapter";
 import { ENV } from "@/core/config/env";
-import LoginController from "@/controllers/login/login";
+import { LoginUseCase } from "@/modules/auth/application/use-cases/login.usecase";
+import { JwtAuthTokenService } from "@/modules/auth/infra/jwt-auth-token.service";
+import { LoginController } from "@/modules/auth/presentation/http/controllers/login.controller";
+import { SequelizeUserRepository } from "@/modules/users/infra/sequelize/sequelize-user.repository"; // exemplo
 import { Controller } from "@/core/protocols";
-import { LoginService } from "@/service/login-service";
+import { logger } from "@/core/logger";
 
 export const LoginControllerFactory = (): Controller => {
-  const encrypter = new BcryptAdapter(ENV.SALT || 10);
-  const tokenizer = new TokenAdapter();
-  const loginService = new LoginService(encrypter, tokenizer);
-  return new LoginController(loginService);
+  const saltRounds = ENV.SALT ? Number(ENV.SALT) : 12;
+
+  const userRepo = new SequelizeUserRepository();
+  const encrypter = new BcryptAdapter(saltRounds);
+  const tokenService = new JwtAuthTokenService(); // ajuste params se precisar (ex.: secret, expiração etc.)
+
+  const useCase = new LoginUseCase(userRepo, encrypter, tokenService, logger);
+  const controller = new LoginController(useCase);
+
+  return controller;
 };

@@ -1,0 +1,29 @@
+import { Links } from "@/core/http/http-resource";
+
+const API_PREFIX = "/api";
+
+export const loginLinks = (): Links => ({
+  self: {
+    href: `${API_PREFIX}/login`,
+    method: "POST",
+  },
+  refreshToken: {
+    href: `${API_PREFIX}/refresh-token`,
+    method: "POST",
+  },
+  me: {
+    href: `${API_PREFIX}/usuarios/me`,
+    method: "GET",
+  },
+});
+
+export const refreshTokenLinks = (): Links => ({
+  self: {
+    href: `${API_PREFIX}/refresh-token`,
+    method: "POST",
+  },
+  login: {
+    href: `${API_PREFIX}/login`,
+    method: "POST",
+  },
+});

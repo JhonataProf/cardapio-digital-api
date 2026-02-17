@@ -1,11 +1,14 @@
 import UserModel from "@/models/user-model";
 import { UserEntity } from "../../domain/entities/user.entity";
-import { CreateUserRepository } from "../../domain/repositories/create-user.repository";
-import { FindUserByIdRepository } from "../../domain/repositories/find-user-by-id.repository";
-import { FindUserByEmailRepository } from "../../domain/repositories/find-user-by-email.repository";
-import { ListUsersRepository } from "../../domain/repositories/list-users.repository";
-import { UpdateUserRepository } from "../../domain/repositories/update-user.repository";
-import { DeleteUserRepository } from "../../domain/repositories/delete-user.repository";
+import {
+  CreateUserRepository,
+  FindUserByIdRepository,
+  FindUserByEmailRepository,
+  ListUsersRepository,
+  UpdateUserRepository,
+  DeleteUserRepository,
+} from "../../domain/repositories";
+import { Transaction } from "sequelize";
 
 export class SequelizeUserRepository
   implements
@@ -16,14 +19,15 @@ export class SequelizeUserRepository
     UpdateUserRepository,
     DeleteUserRepository
 {
-  async create(user: UserEntity): Promise<UserEntity> {
+  async create(user: UserEntity, t?: Transaction): Promise<UserEntity> {
     const created = await UserModel.create({
       nome: user.nome,
       email: user.email,
       senha: user.senha,
       role: user.role,
-    });
+    }, { transaction: t });
 
+    await UserModel.sync();
     return new UserEntity({
       id: created.id,
       nome: created.nome,
@@ -33,8 +37,8 @@ export class SequelizeUserRepository
     });
   }
 
-  async findById(id: number): Promise<UserEntity | null> {
-    const user = await UserModel.findByPk(id);
+  async findById(id: number, t?: Transaction): Promise<UserEntity | null> {
+    const user = await UserModel.findByPk(id, { transaction: t }  );
     if (!user) return null;
 
     return new UserEntity({
@@ -74,7 +78,10 @@ export class SequelizeUserRepository
     );
   }
 
-  async update(id: number, data: Partial<UserEntity>): Promise<UserEntity | null> {
+  async update(
+    id: number,
+    data: Partial<UserEntity>
+  ): Promise<UserEntity | null> {
     const user = await UserModel.findByPk(id);
     if (!user) return null;
 
@@ -94,8 +101,8 @@ export class SequelizeUserRepository
     });
   }
 
-  async delete(id: number): Promise<boolean> {
-    const deleted = await UserModel.destroy({ where: { id } });
+  async delete(id: number, transaction?: Transaction): Promise<boolean> {
+    const deleted = await UserModel.destroy({ where: { id }, transaction });
     return deleted > 0;
   }
 }

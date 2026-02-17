@@ -1,11 +1,11 @@
-import sequelize from "../core/database";
+import sequelize from "@/core/database";
 import { Role } from "../enums/role";
 import { Encrypter } from "@/core/interfaces";
 import Cliente from "../models/cliente-model";
 import Funcionario from "../models/funcionario-model";
 import Gerente from "../models/gerente-model";
 import User from "../models/user-model";
-import { CreateUserDTO, ResponseCreateUserDto } from "../types";
+import { CreateUserDTO } from "../types";
 
 export class UsuarioService {
   private readonly encrypter: Encrypter;
@@ -66,9 +66,7 @@ export class UsuarioService {
     return userAtualizado.toJSON();
   }
 
-  async criarUsuario(
-    dadosUsuario: CreateUserDTO
-  ): Promise<ResponseCreateUserDto> {
+  async criarUsuario(dadosUsuario: CreateUserDTO): Promise<object> {
     const { nome, email, senha, role } = dadosUsuario;
     const senhaCriptografada = await this.encrypter.hash(senha);
 
@@ -78,10 +76,15 @@ export class UsuarioService {
       senha: senhaCriptografada,
       role,
     });
-    await this.__criarPerfil({ userId: usuario.id, role, nome, telefone: dadosUsuario?.telefone });
+    await this.__criarPerfil({
+      userId: usuario.id,
+      role,
+      nome,
+      // telefone: dadosUsuario?.telefone,
+    });
     await User.sync();
     const usuarioCriado = await User.findByPk(usuario.id);
-    if(!usuarioCriado) {
+    if (!usuarioCriado) {
       throw new Error("Erro ao criar usuário");
     }
     return {
@@ -89,9 +92,8 @@ export class UsuarioService {
       nome: usuarioCriado?.nome,
       email: usuarioCriado.email,
       role: usuarioCriado?.role,
-      telefone: dadosUsuario.telefone,
+      // telefone: dadosUsuario.telefone,
     };
-
   }
 
   async __buscarPerfilPorUserId(userId: number) {

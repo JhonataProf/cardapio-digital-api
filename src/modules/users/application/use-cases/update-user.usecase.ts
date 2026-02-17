@@ -21,7 +21,7 @@ export class UpdateUserUseCase {
 
     const dataToUpdate: Partial<UserProps> = {
       nome: input.nome ?? existing.nome,
-      senha: input.senha ?? existing.senha,
+      email: input.email ?? existing.email,
       role: input.role ?? existing.role,
     };
 

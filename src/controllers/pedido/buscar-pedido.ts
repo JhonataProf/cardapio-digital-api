@@ -1,4 +1,4 @@
-import { ok, serverError } from "@/core/helpers/http-helper";
+import { ok, serverError } from "../../helpers/http-helper";
 import { Controller, HttpRequest, HttpResponse } from "@/core/protocols";
 import { PedidoService } from "../../service/pedido-service";
 

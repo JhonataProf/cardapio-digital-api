@@ -1,8 +1,10 @@
 import { Controller, HttpRequest, HttpResponse } from "@/core/protocols";
-import { ok, serverError } from "@/core/helpers/http-helper";
+import { ok, serverError } from "@/helpers/http-helper";
 import { ListUsersUseCase } from "../../../application/use-cases/list-users.usecase";
-import { resourceOf } from "@/core/helpers/hateoas";
+import { resourceOf } from "@/helpers/hateoas";
 import { logger } from "@/core/config/logger";
+import { collection } from "@/core/http/http-resource";
+import { userLinks, usersCollectionLinks } from "../user-hateoas";
 
 export class ListUsersController implements Controller {
   constructor(private readonly useCase: ListUsersUseCase) {}
@@ -11,23 +13,23 @@ export class ListUsersController implements Controller {
     try {
       const users = await this.useCase.execute();
 
-      const resource = resourceOf(
-        users.map((u) => ({
-          id: u.id,
-          nome: u.nome,
-          email: u.email,
-          role: u.role,
-        }))
-      )
-        .addLink("self", "GET", "/usuarios")
-        .addLink("create", "POST", "/usuarios")
-        .build();
+      const data = users.map((user) => ({
+        id: user.id,
+        nome: user.nome,
+        email: user.email,
+        role: user.role,
+        links: userLinks(user.id), // HATEOAS por item
+      }));
 
-      logger.debug("ListUsersController: usuários listados", {
-        total: users.length,
+      const body = collection(data, usersCollectionLinks(), {
+        count: data.length,
       });
 
-      return ok(resource);
+      logger.debug("ListUsersController: usuários listados", {
+        total: data.length,
+      });
+
+      return ok(body);
     } catch (error) {
       logger.error("ListUsersController: erro inesperado", {
         error:
