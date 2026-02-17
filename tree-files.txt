@@ -1,0 +1,257 @@
+tree -a -I .*|node_modules|*lock|coverage
+.
+├── README.md
+├── jest-integration-config.js
+├── jest-unit-config.ts
+├── jest.config.ts
+├── nodemon.json
+├── package-lock.json
+├── package.json
+├── src
+│   ├── controllers
+│   │   ├── login
+│   │   │   ├── login.ts
+│   │   │   └── refresh-token.ts
+│   │   ├── pedido
+│   │   │   ├── atualizar-pedido.ts
+│   │   │   ├── buscar-pedido.ts
+│   │   │   ├── criar-pedido.ts
+│   │   │   ├── deletar-pedido.ts
+│   │   │   └── listar-pedido.ts
+│   │   ├── prato
+│   │   │   ├── criar-prato.ts
+│   │   │   ├── deletar-prato.ts
+│   │   │   ├── editar-prato.ts
+│   │   │   └── listar-prato.ts
+│   │   └── usuario
+│   │       ├── criar-usuario.ts
+│   │       ├── deletar-usuario.ts
+│   │       ├── editar-usuario.ts
+│   │       └── listar-usuario.ts
+│   ├── core
+│   │   ├── adapters
+│   │   │   ├── bcrypt-adapter.ts
+│   │   │   ├── express-route-adapter.ts
+│   │   │   └── token-adapter.ts
+│   │   ├── config
+│   │   │   ├── app.ts
+│   │   │   ├── config.json
+│   │   │   ├── env.ts
+│   │   │   ├── initializeDatabaseAndServer.ts
+│   │   │   ├── logger.ts
+│   │   │   ├── middlewares.ts
+│   │   │   ├── paths.ts
+│   │   │   ├── routes.ts
+│   │   │   └── swagger.ts
+│   │   ├── database.ts
+│   │   ├── errors
+│   │   │   ├── index.ts
+│   │   │   ├── invalid-param-errors.ts
+│   │   │   ├── missing-param-errors.ts
+│   │   │   ├── server-errors.ts
+│   │   │   └── unauthorized-error.ts
+│   │   ├── errors-app-error.ts
+│   │   ├── helpers
+│   │   │   ├── hateoas.ts
+│   │   │   └── http-helper.ts
+│   │   ├── http
+│   │   │   ├── http-error-response.ts
+│   │   │   ├── http-resource.ts
+│   │   │   ├── index.ts
+│   │   │   └── middlewares
+│   │   │       ├── auth-middleware.ts
+│   │   │       ├── authorize-roles.ts
+│   │   │       ├── body-parser.ts
+│   │   │       ├── content-type.ts
+│   │   │       ├── correlation-id.ts
+│   │   │       ├── cors.ts
+│   │   │       ├── error-handlers.ts
+│   │   │       ├── index.ts
+│   │   │       ├── security-headers.ts
+│   │   │       └── validate-body.ts
+│   │   ├── interfaces
+│   │   │   └── index.ts
+│   │   ├── logger
+│   │   │   ├── domain-logger.ts
+│   │   │   ├── index.ts
+│   │   │   └── logger.ts
+│   │   └── protocols
+│   │       ├── controller.ts
+│   │       ├── http.ts
+│   │       └── index.ts
+│   ├── docs
+│   │   ├── api
+│   │   │   └── swagger.yaml
+│   │   └── swagger
+│   │       ├── auth.yaml
+│   │       ├── base.yaml
+│   │       ├── pedidos.yaml
+│   │       ├── pratos.yaml
+│   │       └── users.yaml
+│   ├── enums
+│   │   ├── role.ts
+│   │   └── status-pedido.ts
+│   ├── factories
+│   │   └── controller
+│   │       ├── login
+│   │       │   ├── login-controller-factory.ts
+│   │       │   └── refresh-token-controller-factory.ts
+│   │       └── usuario
+│   │           ├── create-user-controller-factory.ts
+│   │           ├── delete-user-controller-factory.ts
+│   │           ├── get-user-by-id-controller-factory.ts
+│   │           ├── list-users-controller-factory.ts
+│   │           └── update-user-controller-factory.ts
+│   ├── helpers
+│   │   ├── hateoas.ts
+│   │   └── http-helper.ts
+│   ├── models
+│   │   ├── cliente-model.ts
+│   │   ├── funcionario-model.ts
+│   │   ├── gerente-model.ts
+│   │   ├── pedido-model.ts
+│   │   ├── prato-model.ts
+│   │   └── user-model.ts
+│   ├── modules
+│   │   ├── auth
+│   │   │   ├── application
+│   │   │   │   └── use-cases
+│   │   │   │       ├── login.usecase.ts
+│   │   │   │       └── refresh-token.usecase.ts
+│   │   │   ├── domain
+│   │   │   │   ├── errors
+│   │   │   │   │   └── auth-errors.ts
+│   │   │   │   └── services
+│   │   │   │       └── auth-token.service.ts
+│   │   │   ├── infra
+│   │   │   │   └── jwt-auth-token.service.ts
+│   │   │   └── presentation
+│   │   │       └── http
+│   │   │           ├── auth-hateoas.ts
+│   │   │           ├── controllers
+│   │   │           │   ├── login.controller.ts
+│   │   │           │   └── refresh-token.controller.ts
+│   │   │           ├── routes
+│   │   │           │   └── auth.routes.ts
+│   │   │           └── validators
+│   │   │               └── auth-schemas.ts
+│   │   └── users
+│   │       ├── application
+│   │       │   └── use-cases
+│   │       │       ├── create-user.usecase.ts
+│   │       │       ├── delete-user.usecase.ts
+│   │       │       ├── get-user-by-id.usecase.ts
+│   │       │       ├── index.ts
+│   │       │       ├── list-users.usecase.ts
+│   │       │       └── update-user.usecase.ts
+│   │       ├── domain
+│   │       │   ├── entities
+│   │       │   │   └── user.entity.ts
+│   │       │   ├── errors
+│   │       │   │   └── user-errors.ts
+│   │       │   ├── profile
+│   │       │   │   ├── profile-creation-strategy.ts
+│   │       │   │   ├── profile-creator.ts
+│   │       │   │   └── profile-strategy-factory.ts
+│   │       │   └── repositories
+│   │       │       ├── create-user.repository.ts
+│   │       │       ├── delete-user.repository.ts
+│   │       │       ├── find-user-by-email.repository.ts
+│   │       │       ├── find-user-by-id.repository.ts
+│   │       │       ├── index.ts
+│   │       │       ├── list-users.repository.ts
+│   │       │       └── update-user.repository.ts
+│   │       ├── infra
+│   │       │   ├── profile
+│   │       │   │   ├── cliente-profile.strategy.ts
+│   │       │   │   ├── funcionario-profile.strategy.ts
+│   │       │   │   └── gerente-profile.strategy.ts
+│   │       │   └── sequelize
+│   │       │       └── sequelize-user.repository.ts
+│   │       └── presentation
+│   │           └── http
+│   │               ├── controllers
+│   │               │   ├── create-user.controller.ts
+│   │               │   ├── delete-user.controller.ts
+│   │               │   ├── get-user-by-id.controller.ts
+│   │               │   ├── index.ts
+│   │               │   ├── list-users.controller.ts
+│   │               │   └── update-user.controller.ts
+│   │               ├── routes
+│   │               │   └── user.routes.ts
+│   │               ├── user-hateoas.ts
+│   │               └── validators
+│   │                   └── user-schemas.ts
+│   ├── routes
+│   │   ├── atualizar-pedido.ts
+│   │   ├── buscar-pedido.ts
+│   │   ├── buscar-usuario.ts
+│   │   ├── criar-pedido.ts
+│   │   ├── criar-prato.ts
+│   │   ├── criar-usuario.ts
+│   │   ├── deletar-pedido.ts
+│   │   ├── deletar-prato.ts
+│   │   ├── deletar-usuario.ts
+│   │   ├── editar-prato.ts
+│   │   ├── editar-usuario.ts
+│   │   ├── listar-pedido.ts
+│   │   ├── listar-prato.ts
+│   │   ├── listar-usuario.ts
+│   │   ├── login.ts
+│   │   └── refresh-token.ts
+│   ├── schemas
+│   │   ├── index.ts
+│   │   ├── login.ts
+│   │   └── user.ts
+│   ├── server.ts
+│   ├── service
+│   │   ├── login-service.ts
+│   │   ├── pedido-service.ts
+│   │   ├── prato-service.ts
+│   │   └── usuario-service.ts
+│   ├── shared
+│   │   └── index.ts
+│   └── types
+│       ├── index.ts
+│       ├── login
+│       │   └── index.ts
+│       ├── pedidos
+│       │   └── index.ts
+│       ├── perfis
+│       │   └── index.ts
+│       ├── pratos
+│       │   └── index.ts
+│       └── usuarios
+│           └── index.ts
+├── test
+│   ├── factories
+│   │   ├── gerente-factory.ts
+│   │   └── user-factory.ts
+│   ├── helpers
+│   │   ├── api.ts
+│   │   ├── auth.ts
+│   │   └── db.ts
+│   ├── integration
+│   │   └── create-user-controller.test.ts
+│   ├── tsconfig.json
+│   └── unit
+│       ├── adapters
+│       │   └── bcrypt-adapter.spec.ts
+│       ├── middlewares
+│       │   └── authorize-roles.spec.ts
+│       └── modules
+│           ├── auth
+│           │   ├── login.usecase.spec.ts
+│           │   └── refresh-token.usecase.spec.ts
+│           └── users
+│               ├── create-user.usecase.spec.ts
+│               ├── delete-user.usecase.spec.ts
+│               ├── get-user-by-id.usecase.spec.ts
+│               ├── list-users.usecase.spec.ts
+│               └── update-user.usecase.spec.ts
+├── tree-files.txt
+├── tsconfig.build.json
+├── tsconfig.json
+└── tsconfig.spec.json
+
+76 directories, 178 files

@@ -1,8 +1,8 @@
 import {
-  ProfileCreationStrategy,
   ProfileCreationContext,
+  ProfileCreationStrategy,
 } from "@/modules/users/domain/profile/profile-creation-strategy";
-import Cliente from "@/models/cliente-model";
+import Cliente from "@/modules/users/infra/model/cliente-model";
 import { Transaction } from "sequelize";
 
 export class ClienteProfileStrategy implements ProfileCreationStrategy {

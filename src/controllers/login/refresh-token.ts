@@ -1,4 +1,6 @@
 import { logger } from "@/core/config/logger";
+import { Tokenizer } from "@/core/interfaces";
+import { Controller, HttpRequest, HttpResponse } from "@/core/protocols";
 import { resourceOf } from "@/helpers/hateoas";
 import {
   badRequestResource,
@@ -6,9 +8,7 @@ import {
   serverError,
   unauthorizedResource,
 } from "@/helpers/http-helper";
-import { Tokenizer } from "@/core/interfaces";
-import User from "@/models/user-model";
-import { Controller, HttpRequest, HttpResponse } from "@/core/protocols";
+import User from "@/modules/users/infra/model/user-model";
 import { AuthResponseDTO, RefreshTokenDTO } from "@/types/login";
 
 export class RefreshTokenController implements Controller {

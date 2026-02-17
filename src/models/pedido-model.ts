@@ -1,6 +1,6 @@
 import { DataTypes, Model } from "sequelize";
 import sequelize from "@/core/database";
-import { User } from "./user-model";
+import { User } from "@/modules/users/infra/model/user-model";
 
 export class Pedido extends Model {
   id!: number;

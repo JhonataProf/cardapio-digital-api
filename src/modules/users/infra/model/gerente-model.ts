@@ -1,18 +1,17 @@
-import { DataTypes, Model } from "sequelize";
 import sequelize from "@/core/database";
+import { DataTypes, Model } from "sequelize";
 import User from "./user-model";
 
-class Funcionario extends Model {
+class Gerente extends Model {
   id!: number;
   nome!: string;
   email!: string;
-  cargo!: string;
   telefone!: string;
   userId!: number;
-  user!: User;
+  user!: User; // Associação com o modelo User
 }
 
-Funcionario.init(
+Gerente.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -23,10 +22,6 @@ Funcionario.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    cargo: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
     telefone: {
       type: DataTypes.STRING,
       allowNull: true,
@@ -35,15 +30,15 @@ Funcionario.init(
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: "Users", // Name of the target model
-        key: "id", // Key in the target model that we're referencing
+        model: "Users", // Nome do modelo alvo
+        key: "id", // Chave no modelo alvo que estamos referenciando
       },
     },
   },
   {
     sequelize,
-    modelName: "Funcionarios",
+    modelName: "Gerentes",
   }
 );
-Funcionario.belongsTo(User, { foreignKey: "userId", as: "user", onDelete: "CASCADE", onUpdate: "CASCADE" });
-export default Funcionario;
+Gerente.belongsTo(User, { foreignKey: "userId", as: "user", onDelete: "CASCADE", onUpdate: "CASCADE" });
+export default Gerente;

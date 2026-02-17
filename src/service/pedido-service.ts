@@ -1,5 +1,5 @@
 import { BcryptAdapter } from "@/core/adapters/bcrypt-adapter";
-import Cliente from "@/models/cliente-model";
+import Cliente from "@/modules/users/infra/model/cliente-model";
 import { StatusPedido } from "../enums/status-pedido";
 import PedidoModel from "../models/pedido-model";
 import { CreatePedidoDTO, PedidoItemDTO, UpdatePedidoDTO } from "../types";

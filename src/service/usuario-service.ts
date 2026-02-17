@@ -1,10 +1,10 @@
 import sequelize from "@/core/database";
-import { Role } from "../enums/role";
 import { Encrypter } from "@/core/interfaces";
-import Cliente from "../models/cliente-model";
-import Funcionario from "../models/funcionario-model";
-import Gerente from "../models/gerente-model";
-import User from "../models/user-model";
+import { Role } from "../enums/role";
+import Cliente from "../modules/users/infra/model/cliente-model";
+import Funcionario from "../modules/users/infra/model/funcionario-model";
+import Gerente from "../modules/users/infra/model/gerente-model";
+import User from "../modules/users/infra/model/user-model";
 import { CreateUserDTO } from "../types";
 
 export class UsuarioService {

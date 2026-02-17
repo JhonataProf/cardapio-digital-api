@@ -1,17 +1,17 @@
-import { DataTypes, Model } from "sequelize";
 import sequelize from "@/core/database";
+import { DataTypes, Model } from "sequelize";
 import User from "./user-model";
 
-class Gerente extends Model {
+export class Cliente extends Model {
   id!: number;
   nome!: string;
-  email!: string;
+  endereco!: string;
   telefone!: string;
   userId!: number;
-  user!: User; // Associação com o modelo User
+  user!: User;
 }
 
-Gerente.init(
+Cliente.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -22,6 +22,10 @@ Gerente.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    endereco: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     telefone: {
       type: DataTypes.STRING,
       allowNull: true,
@@ -30,15 +34,15 @@ Gerente.init(
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: "Users", // Nome do modelo alvo
-        key: "id", // Chave no modelo alvo que estamos referenciando
+        model: "Users", // Name of the target model
+        key: "id", // Key in the target model that we're referencing
       },
     },
   },
   {
     sequelize,
-    modelName: "Gerentes",
+    modelName: "Clientes",
   }
 );
-Gerente.belongsTo(User, { foreignKey: "userId", as: "user", onDelete: "CASCADE", onUpdate: "CASCADE" });
-export default Gerente;
+Cliente.belongsTo(User, { foreignKey: "userId", as: "user", onDelete: "CASCADE", onUpdate: "CASCADE" });
+export default Cliente;

@@ -1,9 +1,9 @@
-import Funcionario from "@/models/funcionario-model";
-import { Transaction } from "sequelize";
 import {
-  ProfileCreationStrategy,
   ProfileCreationContext,
+  ProfileCreationStrategy,
 } from "@/modules/users/domain/profile/profile-creation-strategy";
+import Funcionario from "@/modules/users/infra/model/funcionario-model";
+import { Transaction } from "sequelize";
 
 export class FuncionarioProfileStrategy implements ProfileCreationStrategy {
   async removeProfile(userId: number, transaction: Transaction): Promise<void> {

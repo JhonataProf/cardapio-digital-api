@@ -1,14 +1,14 @@
-import UserModel from "@/models/user-model";
+import UserModel from "@/modules/users/infra/model/user-model";
+import { Transaction } from "sequelize";
 import { UserEntity } from "../../domain/entities/user.entity";
 import {
   CreateUserRepository,
-  FindUserByIdRepository,
+  DeleteUserRepository,
   FindUserByEmailRepository,
+  FindUserByIdRepository,
   ListUsersRepository,
   UpdateUserRepository,
-  DeleteUserRepository,
 } from "../../domain/repositories";
-import { Transaction } from "sequelize";
 
 export class SequelizeUserRepository
   implements

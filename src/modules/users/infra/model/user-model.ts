@@ -1,9 +1,5 @@
-import { DataTypes, Model } from "sequelize";
 import sequelize from "@/core/database";
-import { userInfo } from "os";
-import Gerente from "./gerente-model";
-import Funcionario from "./funcionario-model";
-import { Cliente } from "./cliente-model";
+import { DataTypes, Model } from "sequelize";
 
 export class User extends Model {
   id!: number;

@@ -1,9 +1,49 @@
-// src/config/initializeDatabaseAndServer.ts
-import fs from "fs";
-import path from "path";
+// src/core/config/initializeDatabaseAndServer.ts
+import fs from "node:fs";
+import path from "node:path";
+import { pathToFileURL } from "node:url";
 import { Sequelize } from "sequelize";
 import { ENV } from "./env";
-import { logger } from "@/core/config/logger";
+import { logger } from "./logger";
+import { resolveRuntimeDir } from "./paths";
+
+type WalkOptions = {
+  exts: string[];
+  match: (fullPath: string) => boolean;
+};
+
+async function importModule(fullPath: string) {
+  try {
+    return await import(fullPath); // ✅ CJS-friendly
+  } catch {
+    return await import(pathToFileURL(fullPath).href); // ✅ ESM-friendly fallback
+  }
+}
+
+function walkDir(root: string, opts: WalkOptions, acc: string[] = []): string[] {
+  if (!fs.existsSync(root)) return acc;
+
+  const entries = fs.readdirSync(root, { withFileTypes: true });
+
+  for (const e of entries) {
+    // opcional: ignore pastas comuns
+    if (e.isDirectory() && ["node_modules", "dist", "coverage"].includes(e.name)) continue;
+
+    const full = path.join(root, e.name);
+
+    if (e.isDirectory()) {
+      walkDir(full, opts, acc);
+      continue;
+    }
+
+    const hasExt = opts.exts.some((ext) => full.endsWith(ext));
+    if (!hasExt) continue;
+
+    if (opts.match(full)) acc.push(full);
+  }
+
+  return acc;
+}
 
 export const initializeDatabaseAndServer = async (sequelize: Sequelize) => {
   if (!ENV.UPDATE_MODEL) {
@@ -12,33 +52,44 @@ export const initializeDatabaseAndServer = async (sequelize: Sequelize) => {
   }
 
   try {
-    const modelsPath = path.resolve(__dirname, "../../models");
+    const exts = ENV.NODE_ENV === "production" ? [".js"] : [".ts", ".js"];
 
-    if (!fs.existsSync(modelsPath)) {
-      logger.warn("Models folder not found", { modelsPath });
+    const modelsDir = resolveRuntimeDir("models");   // src/models (legado)
+    const modulesDir = resolveRuntimeDir("modules"); // src/modules (novo)
+
+    const roots = [modelsDir, modulesDir].filter(Boolean) as string[];
+
+    if (roots.length === 0) {
+      logger.warn("No models/modules folders found to load models");
       return;
     }
 
-    const exts = ENV.NODE_ENV === "production" ? [".js"] : [".ts", ".js"];
+    const modelFiles = roots.flatMap((root) =>
+      walkDir(root, {
+        exts,
+        match: (fullPath) => /-model\.(ts|js)$/.test(fullPath),
+      })
+    );
 
-    const modelFiles = fs
-      .readdirSync(modelsPath)
-      .filter((file) => exts.some((ext) => file.endsWith(`-model${ext}`)));
+    logger.info("Loading Sequelize models (dynamic)", {
+      roots,
+      count: modelFiles.length,
+    });
 
     const db: Record<string, any> = { sequelize, Sequelize };
 
-    logger.info("Loading Sequelize models", { modelsPath, modelFiles });
-
-    // Carrega models
-    for (const file of modelFiles) {
-      const fullPath = path.join(modelsPath, file);
-      const mod = await import(fullPath);
+    for (const fullPath of modelFiles) {
+      // Import robusto (funciona melhor com caminhos absolutos)
+      const mod = await importModule(fullPath);
       const model = mod.default ?? mod;
-      const modelName = file.replace(/-model\.(ts|js)$/, "");
+
+      const fileName = path.basename(fullPath);
+      const modelName = fileName.replace(/-model\.(ts|js)$/, "");
+
       db[modelName] = model;
     }
 
-    // Associações padrão (se o model expuser .associate)
+    // associações se existirem
     Object.values(db).forEach((m: any) => {
       if (m && typeof m.associate === "function") {
         m.associate(db);
@@ -53,18 +104,16 @@ export const initializeDatabaseAndServer = async (sequelize: Sequelize) => {
       ENV.NODE_ENV === "production"
         ? {}
         : ENV.NODE_ENV === "test"
-        ? { force: true } // recria para testes
-        : { alter: true }; // dev: atualiza schema sem perder dados (ainda assim com cuidado)
+          ? { force: true }
+          : { alter: true };
 
     logger.info("Syncing database schema", { syncOptions });
-
     await sequelize.sync(syncOptions);
     logger.info("Database schema synchronized successfully");
   } catch (err) {
     logger.error("Error during DB initialization", {
-      error:
-        err instanceof Error ? { message: err.message, stack: err.stack } : err,
+      error: err instanceof Error ? { message: err.message, stack: err.stack } : err,
     });
-    throw err; // importante propagar para o server decidir se sobe ou não
+    throw err;
   }
 };
