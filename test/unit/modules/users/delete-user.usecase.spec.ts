@@ -20,31 +20,43 @@ describe("DeleteUserUseCase", () => {
       ),
     };
 
+    // ✅ mock da strategy factory
+    const strategyMock = {
+      removeProfile: jest.fn(async () => undefined),
+    };
+
+    const profileStrategyFactoryMock = {
+      getStrategy: jest.fn(() => strategyMock),
+    };
+
     const deleteRepoMock: DeleteUserRepository = {
       delete: jest.fn(async (id: number) => id === 1),
     };
 
-    const sut = new DeleteUserUseCase(findByIdRepoMock, deleteRepoMock);
+    const sut = new DeleteUserUseCase(findByIdRepoMock, deleteRepoMock, profileStrategyFactoryMock as any);
 
-    return { sut, findByIdRepoMock, deleteRepoMock };
+    return { sut, findByIdRepoMock, deleteRepoMock, profileStrategyFactoryMock };
   };
 
   it("deve retornar false quando usuário não existe e não chamar delete", async () => {
-    const { sut, findByIdRepoMock, deleteRepoMock } = makeSut();
+    const { sut, findByIdRepoMock, deleteRepoMock, profileStrategyFactoryMock } = makeSut();
 
     const result = await sut.execute(999);
 
     expect(findByIdRepoMock.findById).toHaveBeenCalledWith(999);
+    expect(profileStrategyFactoryMock.getStrategy).not.toHaveBeenCalled();
     expect(deleteRepoMock.delete).not.toHaveBeenCalled();
     expect(result).toBe(false);
   });
 
   it("deve deletar usuário existente e retornar true", async () => {
-    const { sut, deleteRepoMock } = makeSut();
+    const { sut, deleteRepoMock, profileStrategyFactoryMock } = makeSut();
 
     const result = await sut.execute(1);
 
-    expect(deleteRepoMock.delete).toHaveBeenCalledWith(1);
+    expect(profileStrategyFactoryMock.getStrategy).toHaveBeenCalledWith("Funcionario");
+    expect(profileStrategyFactoryMock.getStrategy().removeProfile).toHaveBeenCalledWith(1, expect.anything());
+    expect(deleteRepoMock.delete).toHaveBeenCalledWith(1, expect.anything());
     expect(result).toBe(true);
   });
 });

@@ -34,11 +34,6 @@ export function registerUserRoutes(router: Router): void {
   encrypter
 );
 
-  // ✅ se seu CreateUserUseCase exige ProfileStrategyFactory, injete de verdade:
-  // import { ProfileStrategyFactory } from "@/modules/users/domain/profile/profile-strategy-factory";
-  // const profileFactory = new ProfileStrategyFactory();
-  // const createUserUseCase = new CreateUserUseCase(userRepo, userRepo, encrypter, profileFactory, logger);
-
   const listUsersUseCase = new ListUsersUseCase(userRepo);
   const getUserByIdUseCase = new GetUserByIdUseCase(userRepo);
   const updateUserUseCase = new UpdateUserUseCase(userRepo, userRepo, encrypter);
