@@ -1,6 +1,6 @@
 // tests/helpers/api.ts
 import request, { Test } from "supertest";
-import app from "../../src/config/app";
+import app from "@/core/config/app";
 
 export function api() {
   const base = request(app);

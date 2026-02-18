@@ -1,39 +1,63 @@
+// src/server.ts
 import { ENV } from "@/core/config/env";
 import { initializeDatabaseAndServer } from "@/core/config/initializeDatabaseAndServer";
-import sequelize from "./core/database";
-// deve ser a primeira coisa a rodar em prod
+import { logger } from "@/core/config/logger";
+import sequelize from "@/core/database";
+
+// OBS: em muitos setups, o module-alias precisa ser registrado antes
+// de qualquer import com "@/". Se isso for um problema real no seu build,
+// podemos depois separar um entrypoint JS só para registrar aliases.
 if (process.env.NODE_ENV === "production") {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   require("module-alias/register");
 }
+
 async function start() {
   try {
+    logger.info("Bootstrapping HTTP server...", {
+      env: ENV.NODE_ENV,
+      port: ENV.PORT,
+    });
+
     const app = (await import("@/core/config/app")).default;
 
     await initializeDatabaseAndServer(sequelize);
 
     const server = app.listen(ENV.PORT, () => {
-      console.log(`Servidor rodando na porta ${ENV.PORT}`);
-      if (ENV.SWAGGER_ENABLED) {
-        console.log(`Docs: http://localhost:${ENV.PORT}/api-docs`);
-      }
+      logger.info("HTTP server started", {
+        port: ENV.PORT,
+        swaggerEnabled: ENV.SWAGGER_ENABLED,
+        swaggerUrl: ENV.SWAGGER_ENABLED
+          ? `http://localhost:${ENV.PORT}/api-docs`
+          : null,
+      });
     });
 
-    // Graceful shutdown
     const shutdown = async (signal: string) => {
-      console.log(`Recebido ${signal}. Encerrando...`);
+      logger.warn("Received shutdown signal", { signal });
+
       server.close(async () => {
         try {
+          logger.info("Closing DB connection...");
           await sequelize.close();
-          console.log("Conexão com DB fechada.");
+          logger.info("DB connection closed. Exiting process.");
           process.exit(0);
-        } catch (e) {
-          console.error("Erro ao fechar DB:", e);
+        } catch (err) {
+          logger.error("Error while closing DB connection on shutdown", {
+            error:
+              err instanceof Error
+                ? { message: err.message, stack: err.stack }
+                : err,
+          });
           process.exit(1);
         }
       });
+
       // garante encerramento mesmo se algo travar
-      setTimeout(() => process.exit(1), 10_000).unref();
+      setTimeout(() => {
+        logger.error("Forced shutdown due to timeout");
+        process.exit(1);
+      }, 10_000).unref();
     };
 
     process.on("SIGINT", () => shutdown("SIGINT"));
@@ -41,14 +65,28 @@ async function start() {
 
     // Boas práticas de runtime
     process.on("unhandledRejection", (reason) => {
-      console.error("unhandledRejection:", reason);
+      logger.error("unhandledRejection", {
+        reason:
+          reason instanceof Error
+            ? { message: reason.message, stack: reason.stack }
+            : reason,
+      });
+      // aqui você pode decidir se quer encerrar o processo ou não.
+      // Em muitos cenários é mais seguro encerrar.
     });
+
     process.on("uncaughtException", (err) => {
-      console.error("uncaughtException:", err);
+      logger.error("uncaughtException", {
+        error: { message: err.message, stack: err.stack },
+      });
+      // geralmente é recomendável encerrar o processo, pois o estado pode estar corrompido
       process.exit(1);
     });
   } catch (err) {
-    console.error("Falha ao iniciar servidor:", err);
+    logger.error("Failed to start HTTP server", {
+      error:
+        err instanceof Error ? { message: err.message, stack: err.stack } : err,
+    });
     process.exit(1);
   }
 }

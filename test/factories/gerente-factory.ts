@@ -1,6 +1,6 @@
 // tests/factories/gerente-factory.ts
-import Gerente from "../../src/models/gerente-model";
-import type User from "../../src/models/user-model";
+import Gerente from "@/modules/users/infra/model/gerente-model";
+import type User from "@/modules/users/infra/model/user-model";
 
 export async function makeGerente(user: User, attrs?: Partial<Gerente>) {
   return Gerente.create({

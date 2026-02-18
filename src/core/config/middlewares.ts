@@ -1,11 +1,19 @@
 import { Express } from "express";
-import { securityHeaders, cors, bodyParser, contentType } from "@/core/middlewares";
+import {
+  securityHeaders,
+  cors,
+  bodyParser,
+  contentType,
+  correlationIdMiddleware,
+} from "@/core/http/middlewares";
 
 export default (app: Express): void => {
   // Ordem importa:
   // 1) Segurança básica
   app.disable("x-powered-by");
   app.use(securityHeaders);
+
+  app.use(correlationIdMiddleware);
 
   // 2) CORS antes dos parsers (para OPTIONS retornar rápido)
   app.use(cors);

@@ -3,7 +3,7 @@ import YAML from "yamljs";
 import merge from "deepmerge";
 
 const swaggerPath = (...segments: string[]) =>
-  path.resolve(__dirname, "..", "..", "docs", "swagger", ...segments);
+  path.resolve(__dirname, "..", "docs", "swagger", ...segments);
 
 export function loadSwaggerDocument() {
   // carrega os fragmentos

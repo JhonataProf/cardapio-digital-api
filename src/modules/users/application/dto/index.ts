@@ -1,0 +1,20 @@
+import { z } from "zod";
+import {
+  createUserSchema,
+  updateUserSchema,
+} from "@/modules/users/presentation/http/validators/user-schemas";
+
+export type CreateUserDTO = z.infer<typeof createUserSchema>;
+export type UpdateUserDTO = z.infer<typeof updateUserSchema>;
+
+// Se você quiser manter compat com nomes antigos:
+export type CreateUserDto = CreateUserDTO;
+export type UpdateUserDto = UpdateUserDTO;
+
+// Tipo básico de usuário “plain”
+export interface UserViewModel {
+  id: number;
+  nome: string;
+  email: string;
+  role: "Gerente" | "Funcionario" | "Cliente";
+}

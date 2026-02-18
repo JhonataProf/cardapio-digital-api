@@ -1,7 +1,7 @@
 // tests/factories/user-factory.ts
-import User from "../../src/models/user-model";
-import { BcryptAdapter } from "../../src/adapters/bcrypt-adapter";
-import { ENV } from "../../src/config/env";
+import User from "@/modules/users/infra/model/user-model";
+import { BcryptAdapter } from "@/core/adapters/bcrypt-adapter";
+import { ENV } from "@/core/config/env";
 
 const encrypter = new BcryptAdapter(ENV.SALT);
 
