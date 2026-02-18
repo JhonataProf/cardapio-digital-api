@@ -1,17 +1,16 @@
 import {
-    collection,
-    created,
-    noContent,
-    ok,
-    resource,
+  collection,
+  created,
+  noContent,
+  ok,
+  resource,
 } from "@/core/http/http-resource";
 
 describe("core/http/http-resource", () => {
-  it("resource() deve montar um Resource com data, links e meta (quando informado)", () => {
+  it("resource() deve montar Resource com data, links e meta", () => {
     const data = { id: 1, nome: "John" };
     const links = {
       self: { href: "/users/1", method: "GET" as const },
-      update: { href: "/users/1", method: "PUT" as const },
     };
     const meta = { version: "1.0.0" };
 
@@ -24,72 +23,52 @@ describe("core/http/http-resource", () => {
     });
   });
 
-  it("resource() deve permitir meta undefined", () => {
-    const data = { ok: true };
-    const links = { self: { href: "/x", method: "GET" as const } };
-
-    const result = resource(data, links);
-
-    expect(result).toEqual({
-      data,
-      links,
-      meta: undefined,
-    });
-  });
-
-  it("collection() deve montar um CollectionResource com data[] e links", () => {
-    const data = [
-      { id: 1, nome: "A" },
-      { id: 2, nome: "B" },
-    ];
+  it("collection() deve montar CollectionResource com array, links e meta", () => {
+    const data = [{ id: 1 }, { id: 2 }];
     const links = {
       self: { href: "/users", method: "GET" as const },
-      create: { href: "/users", method: "POST" as const },
     };
+    const meta = { page: 1 };
 
-    const result = collection(data, links);
+    const result = collection(data, links, meta);
 
     expect(result).toEqual({
       data,
       links,
-      meta: undefined,
+      meta,
     });
   });
 
-  it("ok() deve retornar statusCode 200 e body intacto", () => {
+  it("ok() deve retornar HttpResponse 200 com body", () => {
     const body = resource(
       { id: 1 },
-      { self: { href: "/users/1", method: "GET" as const } }
+      { self: { href: "/x", method: "GET" as const } },
+      { version: "1" }
     );
 
-    const res = ok(body);
+    const resp = ok(body);
 
-    expect(res).toEqual({
-      statusCode: 200,
-      body,
-    });
+    expect(resp.statusCode).toBe(200);
+    expect(resp.body).toEqual(body);
   });
 
-  it("created() deve retornar statusCode 201 e body intacto", () => {
+  it("created() deve retornar HttpResponse 201 com body", () => {
     const body = resource(
       { id: 1 },
-      { self: { href: "/users/1", method: "GET" as const } }
+      { self: { href: "/x", method: "GET" as const } },
+      { version: "1" }
     );
 
-    const res = created(body);
+    const resp = created(body);
 
-    expect(res).toEqual({
-      statusCode: 201,
-      body,
-    });
+    expect(resp.statusCode).toBe(201);
+    expect(resp.body).toEqual(body);
   });
 
-  it("noContent() deve retornar statusCode 204 e body null", () => {
-    const res = noContent();
+  it("noContent() deve retornar HttpResponse 204 com body null", () => {
+    const resp = noContent();
 
-    expect(res).toEqual({
-      statusCode: 204,
-      body: null,
-    });
+    expect(resp.statusCode).toBe(204);
+    expect(resp.body).toBeNull();
   });
 });

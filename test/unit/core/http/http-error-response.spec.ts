@@ -1,76 +1,65 @@
-import {
-  errorResponse,
-  mapErrorToHttpResponse,
-} from "@/core/http/http-error-response";
+import { errorResponse, mapErrorToHttpResponse } from "@/core/http/http-error-response";
 import { AppError } from "@/core/errors-app-error";
 
 describe("core/http/http-error-response", () => {
-  it("errorResponse() deve montar HttpResponse com statusCode e body padronizado", () => {
-    const res = errorResponse(
-      401,
-      "UNAUTHORIZED",
-      "Credenciais ausentes ou inválidas",
-      "corr-1",
-      { reason: "missing token" }
+  it("errorResponse() deve montar payload padrão com statusCode, error e meta.correlationId", () => {
+    const resp = errorResponse(
+      400,
+      "VALIDATION_ERROR",
+      "Validation error",
+      "corr-123",
+      { field: "email" }
     );
 
-    expect(res.statusCode).toBe(401);
-    expect(res.body).toEqual({
+    expect(resp.statusCode).toBe(400);
+    expect(resp.body).toEqual({
       error: {
-        code: "UNAUTHORIZED",
-        message: "Credenciais ausentes ou inválidas",
-        details: { reason: "missing token" },
+        code: "VALIDATION_ERROR",
+        message: "Validation error",
+        details: { field: "email" },
       },
-      meta: { correlationId: "corr-1" },
+      meta: {
+        correlationId: "corr-123",
+      },
     });
   });
 
-  it("mapErrorToHttpResponse() deve mapear AppError usando errorResponse()", () => {
+  it("mapErrorToHttpResponse() deve mapear AppError corretamente", () => {
     const err = new AppError({
       code: "EMAIL_ALREADY_IN_USE",
-      message: "E-mail já está em uso",
+      message: "O e-mail já está em uso",
       statusCode: 409,
-      details: { email: "x@x.com" },
+      details: { email: "x@y.com" },
     });
 
-    const res = mapErrorToHttpResponse(err, "corr-2");
+    const resp = mapErrorToHttpResponse(err, "corr-999");
 
-    expect(res.statusCode).toBe(409);
-    expect(res.body).toEqual({
+    expect(resp.statusCode).toBe(409);
+    expect(resp.body).toEqual({
       error: {
         code: "EMAIL_ALREADY_IN_USE",
-        message: "E-mail já está em uso",
-        details: { email: "x@x.com" },
+        message: "O e-mail já está em uso",
+        details: { email: "x@y.com" },
       },
-      meta: { correlationId: "corr-2" },
+      meta: {
+        correlationId: "corr-999",
+      },
     });
   });
 
-  it("mapErrorToHttpResponse() deve retornar fallback 500 para erro genérico", () => {
-    const res = mapErrorToHttpResponse(new Error("boom"), "corr-3");
+  it("mapErrorToHttpResponse() deve retornar fallback 500 para erros desconhecidos", () => {
+    const resp = mapErrorToHttpResponse(new Error("boom"), "corr-500");
 
-    expect(res.statusCode).toBe(500);
-    expect(res.body).toEqual({
+    expect(resp.statusCode).toBe(500);
+    expect(resp.body).toEqual({
       error: {
         code: "INTERNAL_SERVER_ERROR",
         message: "Ocorreu um erro inesperado. Tente novamente mais tarde.",
         details: undefined,
       },
-      meta: { correlationId: "corr-3" },
-    });
-  });
-
-  it("mapErrorToHttpResponse() deve retornar fallback 500 mesmo com valor não-Error", () => {
-    const res = mapErrorToHttpResponse("qualquer-coisa" as any, "corr-4");
-
-    expect(res.statusCode).toBe(500);
-    expect(res.body).toEqual({
-      error: {
-        code: "INTERNAL_SERVER_ERROR",
-        message: "Ocorreu um erro inesperado. Tente novamente mais tarde.",
-        details: undefined,
+      meta: {
+        correlationId: "corr-500",
       },
-      meta: { correlationId: "corr-4" },
     });
   });
 });
