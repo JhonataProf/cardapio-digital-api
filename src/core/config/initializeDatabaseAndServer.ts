@@ -1,86 +1,125 @@
 // src/core/config/initializeDatabaseAndServer.ts
-import fs from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { Sequelize } from "sequelize";
+import fg from "fast-glob";
+
 import { ENV } from "./env";
 import { logger } from "./logger";
-import { resolveRuntimeDir } from "./paths";
+import { resolveRuntimePath } from "./paths";
 
 type WalkOptions = {
   exts: string[];
   match: (fullPath: string) => boolean;
 };
 
-async function importModule(fullPath: string) {
+export type InitializeDbDeps = {
+  env?: typeof ENV;
+  log?: typeof logger;
+  resolveRuntimePath?: (relativeFromSrc: string) => string;
+
+  // caso queira manter o seu walkDir existente
+  walkDir?: (root: string, opts: WalkOptions) => string[];
+
+  // opcional: usar fast-glob (preferível p/ módulos)
+  glob?: (pattern: string | string[], opts: fg.Options) => Promise<string[]>;
+
+  importer?: (fullPath: string) => Promise<any>;
+};
+
+async function defaultImportModule(fullPath: string) {
   try {
-    return await import(fullPath); // ✅ CJS-friendly
+    // ts-node/commonjs friendly
+    return await import(fullPath);
   } catch {
-    return await import(pathToFileURL(fullPath).href); // ✅ ESM-friendly fallback
+    // esm fallback
+    return await import(pathToFileURL(fullPath).href);
   }
 }
 
-function walkDir(root: string, opts: WalkOptions, acc: string[] = []): string[] {
+/**
+ * Implementação padrão de walkDir (mantive em for por performance/legibilidade).
+ * Se você já tem um walkDir “padrão do projeto”, injete via deps.walkDir.
+ */
+function defaultWalkDir(root: string, opts: WalkOptions, acc: string[] = []): string[] {
+  const fs = require("node:fs") as typeof import("node:fs");
+
   if (!fs.existsSync(root)) return acc;
 
   const entries = fs.readdirSync(root, { withFileTypes: true });
 
   for (const e of entries) {
-    // opcional: ignore pastas comuns
-    if (e.isDirectory() && ["node_modules", "dist", "coverage"].includes(e.name)) continue;
-
     const full = path.join(root, e.name);
 
     if (e.isDirectory()) {
-      walkDir(full, opts, acc);
+      defaultWalkDir(full, opts, acc);
       continue;
     }
 
-    const hasExt = opts.exts.some((ext) => full.endsWith(ext));
-    if (!hasExt) continue;
+    if (!opts.exts.some((ext) => full.endsWith(ext))) continue;
+    if (!opts.match(full)) continue;
 
-    if (opts.match(full)) acc.push(full);
+    acc.push(full);
   }
 
   return acc;
 }
 
-export const initializeDatabaseAndServer = async (sequelize: Sequelize) => {
-  if (!ENV.UPDATE_MODEL) {
-    logger.info("DB init skipped because ENV.UPDATE_MODEL is disabled");
+export async function initializeDatabaseAndServer(
+  sequelize: Sequelize,
+  deps: InitializeDbDeps = {}
+) {
+  const env = deps.env ?? ENV;
+  const log = deps.log ?? logger;
+  const resolvePath = deps.resolveRuntimePath ?? resolveRuntimePath;
+  const importer = deps.importer ?? defaultImportModule;
+  const walkDir = deps.walkDir ?? ((root, opts) => defaultWalkDir(root, opts));
+  const glob = deps.glob ?? fg;
+
+  if (!env.UPDATE_MODEL) {
+    log.info("DB init skipped because ENV.UPDATE_MODEL is disabled");
     return;
   }
 
   try {
-    const exts = ENV.NODE_ENV === "production" ? [".js"] : [".ts", ".js"];
+    // base da runtime (dist/ quando compilado, src/ quando ts-node)
+    // resolveRuntimePath("modules") deve devolver:
+    // - dist/modules (prod) ou src/modules (dev)
+    const modulesDir = resolvePath("modules");
 
-    const modelsDir = resolveRuntimeDir("models");   // src/models (legado)
-    const modulesDir = resolveRuntimeDir("modules"); // src/modules (novo)
+    const exts = env.NODE_ENV === "production" ? [".js"] : [".ts", ".js"];
 
-    const roots = [modelsDir, modulesDir].filter(Boolean) as string[];
-
-    if (roots.length === 0) {
-      logger.warn("No models/modules folders found to load models");
-      return;
-    }
-
-    const modelFiles = roots.flatMap((root) =>
-      walkDir(root, {
-        exts,
-        match: (fullPath) => /-model\.(ts|js)$/.test(fullPath),
-      })
+    // ✅ preferível: glob direto no padrão do módulo
+    // pega APENAS models dentro de infra/model
+    const patterns = exts.map(
+      (ext) => `**/infra/model/**/*-model${ext}`
     );
 
-    logger.info("Loading Sequelize models (dynamic)", {
-      roots,
-      count: modelFiles.length,
+    const modelFullPaths = await glob(patterns, {
+      cwd: modulesDir,
+      absolute: true,
+      onlyFiles: true,
+      unique: true,
+      dot: false,
+    });
+
+    // fallback opcional: se quiser manter walkDir por padrão (não obrigatório)
+    // const modelFullPaths = walkDir(modulesDir, {
+    //   exts,
+    //   match: (fullPath) =>
+    //     fullPath.includes(`${path.sep}infra${path.sep}model${path.sep}`) &&
+    //     /-model\.(ts|js)$/.test(fullPath),
+    // });
+
+    log.info("Loading Sequelize models from modules", {
+      modulesDir,
+      count: modelFullPaths.length,
     });
 
     const db: Record<string, any> = { sequelize, Sequelize };
 
-    for (const fullPath of modelFiles) {
-      // Import robusto (funciona melhor com caminhos absolutos)
-      const mod = await importModule(fullPath);
+    for (const fullPath of modelFullPaths) {
+      const mod = await importer(fullPath);
       const model = mod.default ?? mod;
 
       const fileName = path.basename(fullPath);
@@ -89,31 +128,27 @@ export const initializeDatabaseAndServer = async (sequelize: Sequelize) => {
       db[modelName] = model;
     }
 
-    // associações se existirem
+    // associações (se existir)
     Object.values(db).forEach((m: any) => {
-      if (m && typeof m.associate === "function") {
-        m.associate(db);
-      }
+      if (m && typeof m.associate === "function") m.associate(db);
     });
 
-    logger.info("Authenticating DB connection...");
     await sequelize.authenticate();
-    logger.info("DB connection established");
+    log.info("DB connection established");
 
     const syncOptions =
-      ENV.NODE_ENV === "production"
+      env.NODE_ENV === "production"
         ? {}
-        : ENV.NODE_ENV === "test"
+        : env.NODE_ENV === "test"
           ? { force: true }
           : { alter: true };
 
-    logger.info("Syncing database schema", { syncOptions });
     await sequelize.sync(syncOptions);
-    logger.info("Database schema synchronized successfully");
+    log.info("Database schema synchronized", { syncOptions });
   } catch (err) {
-    logger.error("Error during DB initialization", {
+    log.error("Error during DB initialization", {
       error: err instanceof Error ? { message: err.message, stack: err.stack } : err,
     });
     throw err;
   }
-};
+}
