@@ -9,6 +9,7 @@ import {
   ListUsersRepository,
   UpdateUserRepository,
 } from "../../domain/repositories";
+import { FindClienteByTelefoneRepository } from "../../domain/repositories/find-cliente-by-telefone.repository";
 
 export class SequelizeUserRepository
   implements
@@ -17,8 +18,20 @@ export class SequelizeUserRepository
     FindUserByEmailRepository,
     ListUsersRepository,
     UpdateUserRepository,
-    DeleteUserRepository
+    DeleteUserRepository,
+    FindClienteByTelefoneRepository
 {
+  findByTelefone(telefone: string): Promise<{ userId: number; nome?: string; endereco?: string; telefone?: string; } | null> {
+    return UserModel.findOne({ where: { telefone } }).then(user => {
+      if (!user) return null;
+      return {
+        userId: user.id,
+        nome: user.nome,
+        endereco: "Endereço não informado",
+        telefone: "Telefone não informado",
+      };
+    });
+  }
   async create(user: UserEntity, t?: Transaction): Promise<UserEntity> {
     const created = await UserModel.create({
       nome: user.nome,

@@ -2,7 +2,7 @@ import { Controller, HttpRequest, HttpResponse } from "@/core/protocols";
 import { CreateUserUseCase } from "../../../application/use-cases/create-user.usecase";
 import { created, resource } from "@/core/http/http-resource";
 import { userLinks } from "../user-hateoas";
-import { CreateUserDTO } from "@/types/usuarios";
+import { CreateUserDTO } from "../../../application/dto";
 import { logger } from "@/core/config/logger";
 import { mapErrorToHttpResponse } from "@/core/http/http-error-response";
 

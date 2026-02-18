@@ -1,5 +1,5 @@
-import { Router } from "express";
 import adaptRoute from "@/core/adapters/express-route-adapter";
+import { Router } from "express";
 
 import { LoginController } from "../controllers/login.controller";
 import { RefreshTokenController } from "../controllers/refresh-token.controller";
@@ -7,11 +7,11 @@ import { RefreshTokenController } from "../controllers/refresh-token.controller"
 import { LoginUseCase } from "@/modules/auth/application/use-cases/login.usecase";
 import { RefreshTokenUseCase } from "@/modules/auth/application/use-cases/refresh-token.usecase";
 
-import { JwtAuthTokenService } from "@/modules/auth/infra/jwt-auth-token.service";
 import { BcryptAdapter } from "@/core/adapters/bcrypt-adapter";
+import { JwtAuthTokenService } from "@/modules/auth/infra/jwt-auth-token.service";
 
-import { SequelizeUserRepository } from "@/modules/users/infra/sequelize/sequelize-user.repository";
 import { logger } from "@/core/config/logger";
+import { SequelizeUserRepository } from "@/modules/users/infra/sequelize/sequelize-user.repository";
 
 import { validateBody } from "@/core/http/middlewares/validate-body";
 import { loginSchema, refreshTokenSchema } from "../validators/auth-schemas";

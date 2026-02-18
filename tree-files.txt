@@ -1,4 +1,3 @@
-tree -a -I '.*|node_modules|*lock|coverage' > tree-files.txt
 .
 ├── README.md
 ├── jest-integration-config.js
@@ -8,26 +7,6 @@ tree -a -I '.*|node_modules|*lock|coverage' > tree-files.txt
 ├── package-lock.json
 ├── package.json
 ├── src
-│   ├── controllers
-│   │   ├── login
-│   │   │   ├── login.ts
-│   │   │   └── refresh-token.ts
-│   │   ├── pedido
-│   │   │   ├── atualizar-pedido.ts
-│   │   │   ├── buscar-pedido.ts
-│   │   │   ├── criar-pedido.ts
-│   │   │   ├── deletar-pedido.ts
-│   │   │   └── listar-pedido.ts
-│   │   ├── prato
-│   │   │   ├── criar-prato.ts
-│   │   │   ├── deletar-prato.ts
-│   │   │   ├── editar-prato.ts
-│   │   │   └── listar-prato.ts
-│   │   └── usuario
-│   │       ├── criar-usuario.ts
-│   │       ├── deletar-usuario.ts
-│   │       ├── editar-usuario.ts
-│   │       └── listar-usuario.ts
 │   ├── core
 │   │   ├── adapters
 │   │   │   ├── bcrypt-adapter.ts
@@ -44,6 +23,15 @@ tree -a -I '.*|node_modules|*lock|coverage' > tree-files.txt
 │   │   │   ├── routes.ts
 │   │   │   └── swagger.ts
 │   │   ├── database.ts
+│   │   ├── docs
+│   │   │   ├── api
+│   │   │   │   └── swagger.yaml
+│   │   │   └── swagger
+│   │   │       ├── auth.yaml
+│   │   │       ├── base.yaml
+│   │   │       ├── pedidos.yaml
+│   │   │       ├── pratos.yaml
+│   │   │       └── users.yaml
 │   │   ├── errors
 │   │   │   ├── index.ts
 │   │   │   ├── invalid-param-errors.ts
@@ -79,38 +67,11 @@ tree -a -I '.*|node_modules|*lock|coverage' > tree-files.txt
 │   │       ├── controller.ts
 │   │       ├── http.ts
 │   │       └── index.ts
-│   ├── docs
-│   │   ├── api
-│   │   │   └── swagger.yaml
-│   │   └── swagger
-│   │       ├── auth.yaml
-│   │       ├── base.yaml
-│   │       ├── pedidos.yaml
-│   │       ├── pratos.yaml
-│   │       └── users.yaml
-│   ├── enums
-│   │   ├── role.ts
-│   │   └── status-pedido.ts
-│   ├── factories
-│   │   └── controller
-│   │       ├── login
-│   │       │   ├── login-controller-factory.ts
-│   │       │   └── refresh-token-controller-factory.ts
-│   │       └── usuario
-│   │           ├── create-user-controller-factory.ts
-│   │           ├── delete-user-controller-factory.ts
-│   │           ├── get-user-by-id-controller-factory.ts
-│   │           ├── list-users-controller-factory.ts
-│   │           └── update-user-controller-factory.ts
-│   ├── helpers
-│   │   ├── hateoas.ts
-│   │   └── http-helper.ts
-│   ├── models
-│   │   ├── pedido-model.ts
-│   │   └── prato-model.ts
 │   ├── modules
 │   │   ├── auth
 │   │   │   ├── application
+│   │   │   │   ├── dto
+│   │   │   │   │   └── index.ts
 │   │   │   │   └── use-cases
 │   │   │   │       ├── login.usecase.ts
 │   │   │   │       └── refresh-token.usecase.ts
@@ -132,8 +93,80 @@ tree -a -I '.*|node_modules|*lock|coverage' > tree-files.txt
 │   │   │           │   └── auth.routes.ts
 │   │   │           └── validators
 │   │   │               └── auth-schemas.ts
+│   │   ├── pedidos
+│   │   │   ├── application
+│   │   │   │   ├── dto
+│   │   │   │   │   ├── create-pedido.dto.ts
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   └── update-pedido.dto.ts
+│   │   │   │   └── use-cases
+│   │   │   │       ├── create-pedido.usecase.ts
+│   │   │   │       ├── delete-pedido.usecase.ts
+│   │   │   │       ├── get-pedido-by-id.usecase.ts
+│   │   │   │       ├── list-pedidos.usecase.ts
+│   │   │   │       └── update-pedido.usecase.ts
+│   │   │   ├── domain
+│   │   │   │   ├── repositories
+│   │   │   │   │   ├── create-pedido.repository.ts
+│   │   │   │   │   ├── delete-pedido.repository.ts
+│   │   │   │   │   ├── find-pedido-by-id.repository.ts
+│   │   │   │   │   ├── list-pedidos.repository.ts
+│   │   │   │   │   └── update-pedido.repository.ts
+│   │   │   │   └── value-objects
+│   │   │   │       └── pedido-status.ts
+│   │   │   ├── infra
+│   │   │   │   ├── model
+│   │   │   │   │   └── pedido-model.ts
+│   │   │   │   └── sequelize
+│   │   │   │       └── sequelize-pedido.repository.ts
+│   │   │   └── presentation
+│   │   │       └── http
+│   │   │           ├── controllers
+│   │   │           │   ├── atualizar-pedido.ts
+│   │   │           │   ├── buscar-pedido.ts
+│   │   │           │   ├── criar-pedido.ts
+│   │   │           │   ├── deletar-pedido.ts
+│   │   │           │   └── listar-pedido.ts
+│   │   │           ├── pedido-hateoas.ts
+│   │   │           ├── routes
+│   │   │           │   └── pedido.routes.ts
+│   │   │           └── validators
+│   │   │               └── pedido-schemas.ts
+│   │   ├── pratos
+│   │   │   ├── application
+│   │   │   │   ├── dto
+│   │   │   │   │   ├── create-prato.dto.ts
+│   │   │   │   │   └── index.ts
+│   │   │   │   └── use-cases
+│   │   │   │       └── create-prato.usecase.ts
+│   │   │   ├── domain
+│   │   │   │   ├── entities
+│   │   │   │   │   └── prato.entity.ts
+│   │   │   │   └── repositories
+│   │   │   │       ├── create-prato.repository.ts
+│   │   │   │       └── index.ts
+│   │   │   ├── infra
+│   │   │   │   ├── model
+│   │   │   │   │   └── prato-model.ts
+│   │   │   │   └── sequelize
+│   │   │   │       └── sequelize-prato.repository.ts
+│   │   │   └── presentation
+│   │   │       └── http
+│   │   │           ├── controller
+│   │   │           │   ├── criar-prato.ts
+│   │   │           │   ├── deletar-prato.ts
+│   │   │           │   ├── editar-prato.ts
+│   │   │           │   ├── index.ts
+│   │   │           │   └── listar-prato.ts
+│   │   │           ├── prato-hateoas.ts
+│   │   │           ├── routes
+│   │   │           │   └── prato.routes.ts
+│   │   │           └── validators
+│   │   │               └── prato-schemas.ts
 │   │   └── users
 │   │       ├── application
+│   │       │   ├── dto
+│   │       │   │   └── index.ts
 │   │       │   └── use-cases
 │   │       │       ├── create-user.usecase.ts
 │   │       │       ├── delete-user.usecase.ts
@@ -150,14 +183,17 @@ tree -a -I '.*|node_modules|*lock|coverage' > tree-files.txt
 │   │       │   │   ├── profile-creation-strategy.ts
 │   │       │   │   ├── profile-creator.ts
 │   │       │   │   └── profile-strategy-factory.ts
-│   │       │   └── repositories
-│   │       │       ├── create-user.repository.ts
-│   │       │       ├── delete-user.repository.ts
-│   │       │       ├── find-user-by-email.repository.ts
-│   │       │       ├── find-user-by-id.repository.ts
-│   │       │       ├── index.ts
-│   │       │       ├── list-users.repository.ts
-│   │       │       └── update-user.repository.ts
+│   │       │   ├── repositories
+│   │       │   │   ├── create-user.repository.ts
+│   │       │   │   ├── delete-user.repository.ts
+│   │       │   │   ├── find-cliente-by-telefone.repository.ts
+│   │       │   │   ├── find-user-by-email.repository.ts
+│   │       │   │   ├── find-user-by-id.repository.ts
+│   │       │   │   ├── index.ts
+│   │       │   │   ├── list-users.repository.ts
+│   │       │   │   └── update-user.repository.ts
+│   │       │   └── value-objects
+│   │       │       └── user-role.ts
 │   │       ├── infra
 │   │       │   ├── model
 │   │       │   │   ├── cliente-model.ts
@@ -184,47 +220,7 @@ tree -a -I '.*|node_modules|*lock|coverage' > tree-files.txt
 │   │               ├── user-hateoas.ts
 │   │               └── validators
 │   │                   └── user-schemas.ts
-│   ├── routes
-│   │   ├── atualizar-pedido.ts
-│   │   ├── buscar-pedido.ts
-│   │   ├── buscar-usuario.ts
-│   │   ├── criar-pedido.ts
-│   │   ├── criar-prato.ts
-│   │   ├── criar-usuario.ts
-│   │   ├── deletar-pedido.ts
-│   │   ├── deletar-prato.ts
-│   │   ├── deletar-usuario.ts
-│   │   ├── editar-prato.ts
-│   │   ├── editar-usuario.ts
-│   │   ├── listar-pedido.ts
-│   │   ├── listar-prato.ts
-│   │   ├── listar-usuario.ts
-│   │   ├── login.ts
-│   │   └── refresh-token.ts
-│   ├── schemas
-│   │   ├── index.ts
-│   │   ├── login.ts
-│   │   └── user.ts
-│   ├── server.ts
-│   ├── service
-│   │   ├── login-service.ts
-│   │   ├── pedido-service.ts
-│   │   ├── prato-service.ts
-│   │   └── usuario-service.ts
-│   ├── shared
-│   │   └── index.ts
-│   └── types
-│       ├── index.ts
-│       ├── login
-│       │   └── index.ts
-│       ├── pedidos
-│       │   └── index.ts
-│       ├── perfis
-│       │   └── index.ts
-│       ├── pratos
-│       │   └── index.ts
-│       └── usuarios
-│           └── index.ts
+│   └── server.ts
 ├── test
 │   ├── factories
 │   │   ├── gerente-factory.ts
@@ -254,6 +250,7 @@ tree -a -I '.*|node_modules|*lock|coverage' > tree-files.txt
 ├── tree-files.txt
 ├── tsconfig.build.json
 ├── tsconfig.json
-└── tsconfig.spec.json
+├── tsconfig.spec.json
+└── tsconfig.tsbuildinfo
 
-78 directories, 178 files
+89 directories, 165 files

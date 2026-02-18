@@ -1,7 +1,7 @@
 import { FindUserByIdRepository } from "../../domain/repositories/find-user-by-id.repository";
 import { UpdateUserRepository } from "../../domain/repositories/update-user.repository";
 import { UserEntity, UserProps } from "../../domain/entities/user.entity";
-import { UpdateUserDTO } from "@/types/usuarios"; // ajuste o nome se necessário
+import { UpdateUserDTO } from "../dto"; // ajuste o nome se necessário
 import { Encrypter } from "@/core/interfaces";
 import { logger } from "@/core/config/logger";
 
